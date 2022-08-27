@@ -154,7 +154,7 @@ function ListAllUsers() {
         {activeIndex === 2 && !isLoading && <AddMeasurements />}
       </div>
     </div>
-  );
+  ); 
 }
 
 export default ListAllUsers;

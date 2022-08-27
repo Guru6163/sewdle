@@ -1,7 +1,5 @@
 import "./App.css";
-import Menubar from "./components/Menubar";
 import ListAllUsers from "./pages/ListAllUsers/ListAllUsers";
-import AddNewUser from "./pages/ListAllUsers/components/AddNewUser";
 import { Routes, Route } from "react-router-dom";
 import Fabrics from "./pages/fabrics/Fabrics";
 import Collections from "./pages/collections/Collections";
@@ -14,6 +12,11 @@ import ListAllCollections from "./pages/collections/components/ListAllCollection
 import AddNewCollection from "./pages/collections/components/AddNewCollection";
 import CollectionDetail from "./pages/collections/components/CollectionDetail";
 import Dashboard from "./pages/dashboard/Dashboard";
+import Orders from "./pages/orders/Orders";
+import ListAllOrders from "./pages/orders/components/ListAllOrders";
+import ListCollectionOrders from "./pages/orders/components/ListCollectionOrders";
+import ListTemplateOrders from "./pages/orders/components/ListTemplateOrders";
+import ListFabricOrders from "./pages/orders/components/ListFabricOrders";
 function App() {
   return (
     <div className="App">
@@ -39,10 +42,11 @@ function App() {
             <Route path="new" element={<AddNewCollection />} />
             <Route path=":id" element={<CollectionDetail />} />
           </Route>
-          <Route path="orders" element={<Templates />}>
-            <Route path="fabrics" element={<ListAllCollections />} />
-            <Route path="collections" element={<AddNewCollection />} />
-            <Route path="templates" element={<CollectionDetail />} />
+          <Route path="orders" element={<Orders />}>
+            <Route path="all" element={<ListAllOrders />} />
+            <Route path="fabrics" element={<ListFabricOrders />} />
+            <Route path="collections" element={<ListCollectionOrders />} />
+            <Route path="templates" element={<ListTemplateOrders />} />
           </Route>
         </Routes>
       </div>
