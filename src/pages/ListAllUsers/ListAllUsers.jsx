@@ -91,7 +91,7 @@ function ListAllUsers() {
   const header = renderHeader();
 
   return (
-    <div>
+    <div className="w-full">
       {/* <Divider className="mt-5" align="center">
         <h2>All Users</h2>
       </Divider> */}
@@ -154,7 +154,7 @@ function ListAllUsers() {
         {activeIndex === 2 && !isLoading && <AddMeasurements />}
       </div>
     </div>
-  ); 
+  );
 }
 
 export default ListAllUsers;

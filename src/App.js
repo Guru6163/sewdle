@@ -17,12 +17,13 @@ import ListAllOrders from "./pages/orders/components/ListAllOrders";
 import ListCollectionOrders from "./pages/orders/components/ListCollectionOrders";
 import ListTemplateOrders from "./pages/orders/components/ListTemplateOrders";
 import ListFabricOrders from "./pages/orders/components/ListFabricOrders";
+
 function App() {
   return (
     <div className="App">
       <Routes></Routes>
 
-      <div className="">
+      <div>
         <Routes>
           <Route path="" element={<Login />} />
           <Route path="allUsers" element={<ListAllUsers />} />

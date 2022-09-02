@@ -122,7 +122,7 @@ const MenubarDemo = () => {
             borderStyle: "none",
             borderRadius: "0px",
           }}
-          className="h-6rem flex flex-end text-white p-0 m-0"
+          className="h-6rem text-white p-0 m-0"
           model={items}
           start={start}
           end={

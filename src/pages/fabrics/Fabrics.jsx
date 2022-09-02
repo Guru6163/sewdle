@@ -1,17 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { InputText } from "primereact/inputtext";
-import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
 import { TabMenu } from "primereact/tabmenu";
-import {
-  useNavigate,
-  Outlet,
-  useParams,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import { ProgressSpinner } from "primereact/progressspinner";
 import ListAllFabrics from "./components/ListAllFabrics";
 import AddNewFabric from "./components/AddNewFabric";
