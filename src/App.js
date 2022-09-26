@@ -1,5 +1,5 @@
 import "./App.css";
-import ListAllUsers from "./pages/ListAllUsers/ListAllUsers";
+import ListAllUsers from "./pages/users/components/ListAllUsers";
 import { Routes, Route } from "react-router-dom";
 import Fabrics from "./pages/fabrics/Fabrics";
 import Collections from "./pages/collections/Collections";
@@ -17,16 +17,22 @@ import ListAllOrders from "./pages/orders/components/ListAllOrders";
 import ListCollectionOrders from "./pages/orders/components/ListCollectionOrders";
 import ListTemplateOrders from "./pages/orders/components/ListTemplateOrders";
 import ListFabricOrders from "./pages/orders/components/ListFabricOrders";
+import Users from "./pages/users/Users";
+import AddNewUser from "./pages/users/components/AddNewUser";
+import AddMeasurements from "./pages/users/components/AddMeasurements";
 
 function App() {
   return (
     <div className="App">
       <Routes></Routes>
-
       <div>
         <Routes>
           <Route path="" element={<Login />} />
-          <Route path="allUsers" element={<ListAllUsers />} />
+          <Route path="users" element={<Users />}>
+            <Route path="allUsers" element={<ListAllUsers />} />
+            <Route path="addUsers" element={<AddNewUser />} />
+            <Route path="addMeasurements" element={<AddMeasurements />} />
+          </Route>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="fabrics" element={<Fabrics />}>
             <Route path="all" element={<ListAllFabrics />} />

@@ -56,16 +56,7 @@ function AddNewUser() {
     },
   });
 
-  const dialogFooter = (
-    <div className="flex justify-content-center">
-      <Button
-        label="OK"
-        className="p-button-text"
-        autoFocus
-        onClick={() => setShowMessage(false)}
-      />
-    </div>
-  );
+
   const passwordHeader = <h6>Pick a password</h6>;
   const passwordFooter = (
     <React.Fragment>
@@ -82,10 +73,10 @@ function AddNewUser() {
 
   return (
     <div>
-      <Divider className="mt-5" align="center">
+      <Divider className="mt-3" align="center">
         <h2>Add New User</h2>
       </Divider>
-      <div className="flex justify-content-center">
+      <div className="flex justify-content-center m-3">
         <form onSubmit={formik.handleSubmit} className="p-fluid">
           <div className="flex">
             <div className="card w-30rem mx-5 ">
