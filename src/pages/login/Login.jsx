@@ -5,12 +5,20 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
 import { Password } from "primereact/password";
+import { login } from "../../api/api";
 
 function Login() {
   const navigate = useNavigate();
-  const [countries, setCountries] = useState([]);
-  const [showMessage, setShowMessage] = useState(false);
-  const [formData, setFormData] = useState({});
+  const roleIds = [
+    {
+      id: "ff000000-0000-0000-0000-000000000000",
+      role: "Super Admin",
+    },
+    {
+      id: "ff000000-0000-0000-0000-000000000001",
+      role: "Customer",
+    },
+  ];
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -23,10 +31,6 @@ function Login() {
     validate: (data) => {
       let errors = {};
 
-      if (!data.name) {
-        errors.name = "Name is required.";
-      }
-
       if (!data.email) {
         errors.email = "Email is required.";
       } else if (
@@ -34,38 +38,22 @@ function Login() {
       ) {
         errors.email = "Invalid email address. E.g. example@email.com";
       }
-
       if (!data.password) {
         errors.password = "Password is required.";
       }
-
-      if (!data.accept) {
-        errors.accept = "You need to agree to the terms and conditions.";
-      }
-
       return errors;
     },
     onSubmit: (data) => {
-      setFormData(data);
-      setShowMessage(true);
-
+      login(data.email, data.password).then((res) => {
+        if (res.status === 200) {
+          window.localStorage.setItem("user", JSON.stringify(res.data.user));
+          window.localStorage.setItem("token", res.data.token);
+        }
+      });
+      navigate("/dashboard");
       formik.resetForm();
     },
   });
-
-  const passwordHeader = <h6>Pick a password</h6>;
-  const passwordFooter = (
-    <React.Fragment>
-      <Divider />
-      <p className="mt-2">Suggestions</p>
-      <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: "1.5" }}>
-        <li>At least one lowercase</li>
-        <li>At least one uppercase</li>
-        <li>At least one numeric</li>
-        <li>Minimum 8 characters</li>
-      </ul>
-    </React.Fragment>
-  );
 
   return (
     <div style={{ height: "100vh" }} className="">
@@ -103,21 +91,13 @@ function Login() {
                     name="password"
                     value={formik.values.password}
                     onChange={formik.handleChange}
-                    toggleMask
-                    header={passwordHeader}
-                    footer={passwordFooter}
                   />
                   <label htmlFor="password">Password*</label>
                 </span>
               </div>
             </div>
           </div>
-          <Button
-            type="submit"
-            label="Submit"
-            className="mt-2 w-30rem"
-            onClick={() => navigate("/allUsers")}
-          />
+          <Button type="submit" label="Submit" className="mt-2 w-30rem" />
         </form>
       </div>
     </div>

@@ -146,6 +146,7 @@ function ListAllFabrics() {
     <div className="dataview-demo">
       <div className="card">
         <DataView
+        
           value={products}
           layout={"grid"}
           itemTemplate={itemTemplate}
