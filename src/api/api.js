@@ -9,6 +9,15 @@ const login = async (email, password) => {
   return response;
 };
 
+const addMeasurement = async(body) => {
+  const response = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/admin/measurements/74e26721-8cd8-4680-9983-fbb633c7e6fa`,
+    body,
+  { headers: { "Content-Type": "application/json",
+  Authorization: `Bearer ${window.localStorage.getItem("token")}` } }
+  );
+  return response;
+}
+
 const getAllUsers = async () => {
   const response = await axios.get(
     `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/user/`,
@@ -48,4 +57,4 @@ const deleteUser = async (id) => {
   return response;
 };
 
-export { login, getAllUsers, createUser, deleteUser };
+export { login, getAllUsers, createUser, deleteUser, addMeasurement  };
