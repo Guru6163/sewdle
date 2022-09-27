@@ -91,32 +91,15 @@ function AddMeasurements() {
   const handleClick = async () => {
     const body = {
       ...userMeasurement,
-      profile_name: "dummy2",
-      neck: "23",
-      across_shoulder: "12",
-      bust: "12",
-      under_bust: "11",
-      waist: "10",
-      mid_hip: "33",
-      hips: "45",
-      mid_thigh: "34",
-      armpit: "23",
-      biceps: "36",
-      above_elbow: "23",
-      wrist: "12",
-      body: "98",
-      arm_length: "35",
-      waist_knee: "44",
-      waist_ankle: "12",
-      shoulder_to_floor: "123",
-      cup_size: "S/70B",
-      earrings: "with pins",
-      message: "please make it body fit"
-
+      profile_name: "dummy3",
+      height: "6 ft",
+      weight: "75 kg",
+      gender: "male",
+      age: "25"
     }
     const response = await addMeasurement(body);
 
-    if (response.status === 200) {
+    if (response.status === 204 || response.status === 200) {
       console.log(body);
       // toast.current.show({
       //   severity: "success",
@@ -148,16 +131,50 @@ function AddMeasurements() {
                 <div className="flex-wrap" style={{ width: "80%" }}>
                   <div className=" container flex my-2">
                     <label htmlFor="name" className="mt-4 mr-4">
-                      Date
+                      Profile Name
                     </label>
                     <p className="mt-4 mr-2">:</p>
                     <div>
                       <InputText
-                        id="date"
+                        id="profileName"
                         type="text"
                         className="border-none border-bottom-2"
                         style={{ width: "19rem" }}
-                        
+                        value={userMeasurement.profile_name}
+                        onChange={(e) => 
+                          setUserMeasurement({ ...userMeasurement, profile_name: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className=" container flex my-2">
+                    <label htmlFor="name" className="mt-4 mr-4">
+                      Age
+                    </label>
+                    <p className="mt-4 mr-2">:</p>
+                    <div>
+                      <InputText
+                        id="age"
+                        type="text"
+                        className="border-none border-bottom-2"
+                        style={{ width: "19rem" }}
+                        value={userMeasurement.age}
+                        onChange={(e) => setUserMeasurement({ ...userMeasurement, age: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className=" container flex my-2">
+                    <label htmlFor="name" className="mt-4 mr-4">
+                      Gender
+                    </label>
+                    <p className="mt-4 mr-2">:</p>
+                    <div>
+                      <InputText
+                        id="gender"
+                        type="text"
+                        className="border-none border-bottom-2"
+                        style={{ width: "19rem" }}
+                        value={userMeasurement.gender}
+                        onChange={(e) => setUserMeasurement({ ...userMeasurement, gender: e.target.value })}
                       />
                     </div>
                   </div>
@@ -615,7 +632,7 @@ function AddMeasurements() {
                           Hip length
                         </label>
                       </div>
-                      <div className="flex mr-8" style={{ width: "330px", marginBottom: "35px" }}>
+                      {/* <div className="flex mr-8" style={{ width: "330px", marginBottom: "35px" }}>
                         <InputText
                           id="midthighlength"
                           type="text"
@@ -674,7 +691,7 @@ function AddMeasurements() {
                         <label htmlFor="name" className="mt-2 ml-4">
                           Floor length
                         </label>
-                      </div>
+                      </div> */}
 
                     </div>
 

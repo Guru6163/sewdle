@@ -10,7 +10,7 @@ const login = async (email, password) => {
 };
 
 const addMeasurement = async(body) => {
-  const response = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/admin/measurements/74e26721-8cd8-4680-9983-fbb633c7e6fa`,
+  const response = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/admin/measurements/8b1a97d6-24c1-4c01-a705-14217d7eb32b`,
     body,
   { headers: { "Content-Type": "application/json",
   Authorization: `Bearer ${window.localStorage.getItem("token")}` } }
