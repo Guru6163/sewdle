@@ -1,9 +1,10 @@
 import { Divider } from "primereact/divider";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useFormik } from "formik";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Image } from 'primereact/image';
+import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Password } from "primereact/password";
@@ -13,7 +14,7 @@ import { classNames } from "primereact/utils";
 import bodyImage from "./images/figures-01.png";
 import sleeveImage from "./images/figures-02.png";
 import bottomImage from "./images/figures-03.png";
-import { addMeasurement } from '../../api/api';
+import { addMeasurement, getAllUsers } from '../../api/api';
 
 function AddMeasurements() {
   const [countries, setCountries] = useState([]);
@@ -22,38 +23,49 @@ function AddMeasurements() {
   const [userMeasurement, setUserMeasurement] = useState({});
   const [yesChecked, setYesChecked] = useState(false);
   const [noChecked, setNoChecked] = useState(false);
+  const [userName, setUserName] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [userID, setUserID] = useState();
+
+
+  const toast = useRef(null);
+
+  const onUserChange = (e) => {
+    console.log(e.value)
+    setUserName(e.value)
+    setUserID(e.value.code);
+  };
+
   const formik = useFormik({
     initialValues: {
-      name: "",
-      email: "",
-      password: "",
-      date: null,
-      country: null,
-      accept: false,
+      userName: "",
+      profileName: "",
+      age: "",
+      gender: "",
+      height: "",
+      weight: ""
     },
     validate: (data) => {
       let errors = {};
 
-      if (!data.name) {
-        errors.name = "Name is required.";
+      if (!data.userName) {
+        errors.name = "User Name is required.";
       }
-
-      if (!data.email) {
-        errors.email = "Email is required.";
-      } else if (
-        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(data.email)
-      ) {
-        errors.email = "Invalid email address. E.g. example@email.com";
+      if (!data.profileName) {
+        errors.name = "Profile Name is required.";
       }
-
-      if (!data.password) {
-        errors.password = "Password is required.";
+      if (!data.age) {
+        errors.name = "Age is required.";
       }
-
-      if (!data.accept) {
-        errors.accept = "You need to agree to the terms and conditions.";
+      if (!data.gender) {
+        errors.name = "Gender is required.";
       }
-
+      if (!data.height) {
+        errors.name = "Height is required.";
+      }
+      if (!data.profileName) {
+        errors.name = "Weight is required.";
+      }
       return errors;
     },
     onSubmit: (data) => {
@@ -63,6 +75,20 @@ function AddMeasurements() {
       formik.resetForm();
     },
   });
+
+  const isFormFieldValid = (name) => !!(formik.touched[name] && formik.errors[name]);
+
+  const getFormErrorMessage = (name) => {
+    return isFormFieldValid(name) && <small className="p-error">{formik.errors[name]}</small>;
+  };
+
+  useEffect(() => {
+    getAllUsers().then((data) => {
+      console.log(data); data.data.forEach(user => {
+        setUsers(oldUsers => [...oldUsers, { name: user.first_name, code: user.id }])
+      })
+    })
+  }, []);
 
   const dialogFooter = (
     <div className="flex justify-content-center">
@@ -97,29 +123,30 @@ function AddMeasurements() {
       gender: "male",
       age: "25"
     }
-    const response = await addMeasurement(body);
+    const response = await addMeasurement(body, userID);
 
     if (response.status === 204 || response.status === 200) {
       console.log(body);
-      // toast.current.show({
-      //   severity: "success",
-      //   summary: "Submit Successful",
-      //   detail: "",
-      //   life: 3000,
-      // });
+      toast.current.show({
+        severity: "success",
+        summary: "Submit Successful",
+        detail: "",
+        life: 3000,
+      });
     } else {
-      // toast.current.show({
-      //   severity: "error",
-      //   summary: "Error Occurred",
-      //   detail: "",
-      //   life: 3000,
-      // });
+      toast.current.show({
+        severity: "error",
+        summary: "Error Occurred",
+        detail: "",
+        life: 3000,
+      });
     }
 
   }
 
   return (
     <div>
+      <Toast ref={toast} />
       <Divider className="mt-5" align="center">
         <h2>Add Measurements</h2>
       </Divider>
@@ -130,30 +157,43 @@ function AddMeasurements() {
               <div className="flex justify-content-between" style={{ width: "100%" }}>
                 <div className="flex-wrap" style={{ width: "80%" }}>
                   <div className=" container flex my-2">
-                    <label htmlFor="name" className="mt-4 mr-4">
+                    <label htmlFor="name" className="mt-4" style={{ marginRight: "45px" }}>
+                      User Name
+                    </label>
+                    <p className="mt-4 mr-2">:</p>
+                    <div>
+                      <Dropdown id="userName" name="userName" value={userName} options={users} onChange={onUserChange} optionLabel="name" placeholder="Select a User" />
+                    </div>
+                    {getFormErrorMessage('userName')}
+                  </div>
+                  <div className=" container flex my-2">
+                    <label htmlFor="name" className="mt-4 mr-5">
                       Profile Name
                     </label>
                     <p className="mt-4 mr-2">:</p>
                     <div>
                       <InputText
                         id="profileName"
+                        name="profileName"
                         type="text"
                         className="border-none border-bottom-2"
                         style={{ width: "19rem" }}
                         value={userMeasurement.profile_name}
-                        onChange={(e) => 
+                        onChange={(e) =>
                           setUserMeasurement({ ...userMeasurement, profile_name: e.target.value })}
                       />
                     </div>
+                    {getFormErrorMessage('profileName')}
                   </div>
                   <div className=" container flex my-2">
-                    <label htmlFor="name" className="mt-4 mr-4">
+                    <label htmlFor="name" className="mt-4" style={{ marginRight: "102px" }}>
                       Age
                     </label>
                     <p className="mt-4 mr-2">:</p>
                     <div>
                       <InputText
                         id="age"
+                        name="age"
                         type="text"
                         className="border-none border-bottom-2"
                         style={{ width: "19rem" }}
@@ -161,15 +201,17 @@ function AddMeasurements() {
                         onChange={(e) => setUserMeasurement({ ...userMeasurement, age: e.target.value })}
                       />
                     </div>
+                    {getFormErrorMessage('age')}
                   </div>
                   <div className=" container flex my-2">
-                    <label htmlFor="name" className="mt-4 mr-4">
+                    <label htmlFor="name" className="mt-4" style={{ marginRight: "75px" }}>
                       Gender
                     </label>
                     <p className="mt-4 mr-2">:</p>
                     <div>
                       <InputText
                         id="gender"
+                        name="gender"
                         type="text"
                         className="border-none border-bottom-2"
                         style={{ width: "19rem" }}
@@ -177,17 +219,19 @@ function AddMeasurements() {
                         onChange={(e) => setUserMeasurement({ ...userMeasurement, gender: e.target.value })}
                       />
                     </div>
+                    {getFormErrorMessage('gender')}
                   </div>
 
                   <div className="flex flex-wrap my-2">
                     <div className="flex mr-4">
-                      <label htmlFor="name" className="mt-4 mr-2">
+                      <label htmlFor="name" className="mt-4 mr-8">
                         Height
                       </label>
-                      <p className="mt-4 mr-2">:</p>
+                      <p className="mt-4 mr-2 ml-1">:</p>
                       <div>
                         <InputText
                           id="height"
+                          name="height"
                           type="text"
                           className="border-none border-bottom-2"
                           style={{ width: "28rem" }}
@@ -195,6 +239,7 @@ function AddMeasurements() {
                           onChange={(e) => setUserMeasurement({ ...userMeasurement, height: e.target.value })}
                         />
                       </div>
+                      {getFormErrorMessage('height')}
                     </div>
                     <div className="flex">
                       <label htmlFor="name" className="mt-4 mr-3">
@@ -204,6 +249,7 @@ function AddMeasurements() {
                       <div>
                         <InputText
                           id="weight"
+                          name="weight"
                           type="text"
                           className="border-none border-bottom-2"
                           style={{ width: "19rem" }}
@@ -211,6 +257,7 @@ function AddMeasurements() {
                           onChange={(e) => setUserMeasurement({ ...userMeasurement, weight: e.target.value })}
                         />
                       </div>
+                      {getFormErrorMessage('weight')}
                     </div>
                   </div>
                 </div>
@@ -546,10 +593,10 @@ function AddMeasurements() {
                       Yes
                     </label>
                     <Checkbox
-                    inputId="binary"
-                    className="mt-3"
-                    checked={yesChecked}
-                    onChange={(e) => setYesChecked(e.checked)}
+                      inputId="binary"
+                      className="mt-3"
+                      checked={yesChecked}
+                      onChange={(e) => setYesChecked(e.checked)}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-3" style={{ width: "93px" }}>
@@ -557,10 +604,10 @@ function AddMeasurements() {
                       No
                     </label>
                     <Checkbox
-                    inputId="binary"
-                    className="mt-3"
-                    checked={noChecked}
-                    onChange={(e) => setNoChecked(e.checked)}
+                      inputId="binary"
+                      className="mt-3"
+                      checked={noChecked}
+                      onChange={(e) => setNoChecked(e.checked)}
                     />
                   </div>
 
@@ -581,7 +628,7 @@ function AddMeasurements() {
                     {/* Top Length */}
 
                     <div className="my-2">
-                      <div style={{ marginBottom: "185px" }}>
+                      <div style={{ marginBottom: "180px" }}>
                         <h1 className="text-left">Top length</h1>
                       </div>
                       <div className="flex my-1 mr-8" style={{ width: "310px" }}>
@@ -632,66 +679,6 @@ function AddMeasurements() {
                           Hip length
                         </label>
                       </div>
-                      {/* <div className="flex mr-8" style={{ width: "330px", marginBottom: "35px" }}>
-                        <InputText
-                          id="midthighlength"
-                          type="text"
-                          style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.mid_thigh_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, mid_thigh_length: e.target.value })}
-                        />
-                        <label htmlFor="name" className="mt-2 ml-4">
-                          Mid thigh length
-                        </label>
-                      </div>
-                      <div className="flex mr-8" style={{ width: "330px", marginBottom: "30px" }}>
-                        <InputText
-                          id="kneelength"
-                          type="text"
-                          style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.knee_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, knee_length: e.target.value })}
-                        />
-                        <label htmlFor="name" className="mt-2 ml-4">
-                          Knee length
-                        </label>
-                      </div>
-                      <div className="flex mr-8" style={{ width: "330px", marginBottom: "50px" }}>
-                        <InputText
-                          id="calveslength"
-                          type="text"
-                          style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.calves_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, calves_length: e.target.value })}
-                        />
-                        <label htmlFor="name" className="mt-2 ml-4">
-                          Calves length
-                        </label>
-                      </div>
-                      <div className="flex mr-8" style={{ width: "330px", marginBottom: "40px" }}>
-                        <InputText
-                          id="anklelength"
-                          type="text"
-                          style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.ankle_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, ankle_length: e.target.value })}
-                        />
-                        <label htmlFor="name" className="mt-2 ml-4">
-                          Ankle length
-                        </label>
-                      </div>
-                      <div className="flex my-2 mr-8" style={{ width: "330px" }}>
-                        <InputText
-                          id="floorlength"
-                          type="text"
-                          style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.floor_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, floor_length: e.target.value })}
-                        />
-                        <label htmlFor="name" className="mt-2 ml-4">
-                          Floor length
-                        </label>
-                      </div> */}
 
                     </div>
 
