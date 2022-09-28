@@ -19,7 +19,7 @@ import ListTemplateOrders from "./pages/orders/components/ListTemplateOrders";
 import ListFabricOrders from "./pages/orders/components/ListFabricOrders";
 import Users from "./pages/users/Users";
 import AddNewUser from "./pages/users/components/AddNewUser";
-import AddMeasurements from "./pages/users/components/AddMeasurements";
+import AddMeasurements from "./pages/ListAllUsers/AddMeasurement.jsx";
 
 function App() {
   return (
