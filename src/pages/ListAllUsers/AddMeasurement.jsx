@@ -1,9 +1,10 @@
 import { Divider } from "primereact/divider";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useFormik } from "formik";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Image } from 'primereact/image';
+import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Password } from "primereact/password";
@@ -13,7 +14,7 @@ import { classNames } from "primereact/utils";
 import bodyImage from "./images/figures-01.png";
 import sleeveImage from "./images/figures-02.png";
 import bottomImage from "./images/figures-03.png";
-import { addMeasurement } from '../../api/api';
+import { addMeasurement, getAllUsers } from '../../api/api';
 
 function AddMeasurements() {
   const [countries, setCountries] = useState([]);
@@ -22,47 +23,107 @@ function AddMeasurements() {
   const [userMeasurement, setUserMeasurement] = useState({});
   const [yesChecked, setYesChecked] = useState(false);
   const [noChecked, setNoChecked] = useState(false);
+  const [userName, setUserName] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [userID, setUserID] = useState();
+
+
+  const toast = useRef(null);
+
   const formik = useFormik({
     initialValues: {
-      name: "",
-      email: "",
-      password: "",
-      date: null,
-      country: null,
-      accept: false,
+      user_name: "",
+      profile_name: "",
+      age: "",
+      gender: "",
+      height: "",
+      weight: "",
+      shoulder: "",
+      front_neck_deep: "",
+      back_neck_deep: "",
+      elbow_width: "",
+      elbow_length: "",
+      arm_hole: "",
+      back_cross: "",
+      forearm_width: "",
+      forearm_length: "",
+      upper_chest_width: "",
+      lower_chest_width: "",
+      wrist_width: "",
+      high_waist_width: "",
+      mid_waist_width: "",
+      low_waist_width: "",
+      waist_length: "",
+      chest_width: "",
+      aasan: "",
+      shoulder_to_point: "",
+      point_to_point: "",
+      floor_length: "",
+      thigh_width: "",
+      mid_thigh_length: "",
+      calves_width: "",
+      calves_length: "",
+      hip_width: "",
+      hip_length: "",
+      ankle_width: "",
+      ankle_length: "",
+      knee_length: "",
+      front_cross: "",
+      bicep_width: "",
+      bicep_length: "",
+      full_sleeves_length: "",
+      blouse_length: "",
+      blouse_closure: "",
+      saree_belt_width: "",
+      crop_top_length: "",
     },
     validate: (data) => {
       let errors = {};
 
-      if (!data.name) {
-        errors.name = "Name is required.";
+      if (!data.user_name) {
+        errors.user_name = "User Name is required.";
       }
-
-      if (!data.email) {
-        errors.email = "Email is required.";
-      } else if (
-        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(data.email)
-      ) {
-        errors.email = "Invalid email address. E.g. example@email.com";
+      if (!data.profile_name) {
+        errors.profile_name = "Profile Name is required.";
       }
-
-      if (!data.password) {
-        errors.password = "Password is required.";
+      if (!data.age) {
+        errors.age = "Age is required.";
       }
-
-      if (!data.accept) {
-        errors.accept = "You need to agree to the terms and conditions.";
+      if (!data.gender) {
+        errors.gender = "Gender is required.";
       }
-
+      if (!data.height) {
+        errors.height = "Height is required.";
+      }
+      if (!data.weight) {
+        errors.weight = "Weight is required.";
+      }
       return errors;
     },
     onSubmit: (data) => {
       setFormData(data);
       setShowMessage(true);
-
+      handleClick(data);
       formik.resetForm();
     },
   });
+
+  const isFormFieldValid = (name) => !!(formik.touched[name] && formik.errors[name]);
+
+  const getFormErrorMessage = (name) => {
+    console.log(name)
+    return (
+      isFormFieldValid(name) && (
+        <small className="p-error">{formik.errors[name]}</small>
+      )
+    );
+  };
+
+  useEffect(() => {
+    getAllUsers().then((data) => {
+         setUsers(data.data);
+      })
+  }, []);
 
   const dialogFooter = (
     <div className="flex justify-content-center">
@@ -88,38 +149,35 @@ function AddMeasurements() {
     </React.Fragment>
   );
 
-  const handleClick = async () => {
+  const handleClick = async (data) => {
     const body = {
-      ...userMeasurement,
-      profile_name: "dummy3",
-      height: "6 ft",
-      weight: "75 kg",
-      gender: "male",
-      age: "25"
+      ...data,
+      user_name: data.first_name
     }
-    const response = await addMeasurement(body);
+    const response = await addMeasurement(body, userID);
 
     if (response.status === 204 || response.status === 200) {
-      console.log(body);
-      // toast.current.show({
-      //   severity: "success",
-      //   summary: "Submit Successful",
-      //   detail: "",
-      //   life: 3000,
-      // });
+      console.log(data);
+      toast.current.show({
+        severity: "success",
+        summary: "Submit Successful",
+        detail: "",
+        life: 3000,
+      });
     } else {
-      // toast.current.show({
-      //   severity: "error",
-      //   summary: "Error Occurred",
-      //   detail: "",
-      //   life: 3000,
-      // });
+      toast.current.show({
+        severity: "error",
+        summary: "Error Occurred",
+        detail: "",
+        life: 3000,
+      });
     }
 
   }
-
+  console.log(formik.values);
   return (
     <div>
+      <Toast ref={toast} />
       <Divider className="mt-5" align="center">
         <h2>Add Measurements</h2>
       </Divider>
@@ -130,87 +188,125 @@ function AddMeasurements() {
               <div className="flex justify-content-between" style={{ width: "100%" }}>
                 <div className="flex-wrap" style={{ width: "80%" }}>
                   <div className=" container flex my-2">
-                    <label htmlFor="name" className="mt-4 mr-4">
+                    <label htmlFor="name" className="mt-4" style={{ marginRight: "45px" }}>
+                      User Name
+                    </label>
+                    <p className="mt-4 mr-2">:</p>
+                    <div>
+                      <Dropdown id="user_name" name="user_name" value={formik.values.user_name} options={users} onChange={(e) => {
+                        console.log(e)
+                        formik.handleChange(e)
+                        formik.values.profile_name = e.value.first_name
+                        formik.values.user_name = e.value.first_name
+                        setUserID(e.value.id);
+                      }} optionLabel="first_name" placeholder="Select a User" />
+                    {getFormErrorMessage('user_name')}
+                    </div>
+                  </div>
+                  <div className=" container flex my-2">
+                    <label htmlFor="name" className="mt-4 mr-5">
                       Profile Name
                     </label>
                     <p className="mt-4 mr-2">:</p>
                     <div>
                       <InputText
-                        id="profileName"
+                        id="profile_name"
+                        name="profile_name"
                         type="text"
                         className="border-none border-bottom-2"
                         style={{ width: "19rem" }}
-                        value={userMeasurement.profile_name}
-                        onChange={(e) => 
-                          setUserMeasurement({ ...userMeasurement, profile_name: e.target.value })}
+                        value={formik.values.profile_name}
+                        onChange={formik.handleChange}
                       />
+                    <div className="text-left">
+                    {getFormErrorMessage('profile_name')}
+                    </div>
                     </div>
                   </div>
                   <div className=" container flex my-2">
-                    <label htmlFor="name" className="mt-4 mr-4">
+                    <label htmlFor="name" className="mt-4" style={{ marginRight: "102px" }}>
                       Age
                     </label>
                     <p className="mt-4 mr-2">:</p>
                     <div>
                       <InputText
                         id="age"
+                        name="age"
                         type="text"
                         className="border-none border-bottom-2"
                         style={{ width: "19rem" }}
-                        value={userMeasurement.age}
-                        onChange={(e) => setUserMeasurement({ ...userMeasurement, age: e.target.value })}
-                      />
+                        value={formik.values.age}
+                        onChange={formik.handleChange}
+                        />
+                        <div className="text-left">
+                        {getFormErrorMessage('age')}
+                        </div>  
                     </div>
                   </div>
                   <div className=" container flex my-2">
-                    <label htmlFor="name" className="mt-4 mr-4">
+                    <label htmlFor="name" className="mt-4" style={{ marginRight: "75px" }}>
                       Gender
                     </label>
                     <p className="mt-4 mr-2">:</p>
                     <div>
                       <InputText
                         id="gender"
+                        name="gender"
                         type="text"
                         className="border-none border-bottom-2"
                         style={{ width: "19rem" }}
-                        value={userMeasurement.gender}
-                        onChange={(e) => setUserMeasurement({ ...userMeasurement, gender: e.target.value })}
+                        value={formik.values.gender}
+                        onChange={formik.handleChange}
                       />
+                      <div className="text-left">
+                    {getFormErrorMessage('gender')}
                     </div>
+                    </div>
+                    
                   </div>
 
                   <div className="flex flex-wrap my-2">
                     <div className="flex mr-4">
-                      <label htmlFor="name" className="mt-4 mr-2">
+                      <label htmlFor="name" className="mt-4 mr-8">
                         Height
+                      </label>
+                      <p className="mt-4 mr-2 ml-1">:</p>
+                      <div>
+                        <InputText
+                          id="height"
+                          name="height"
+                          type="text"
+                          className="border-none border-bottom-2"
+                          style={{ width: "19rem" }}
+                          value={formik.values.height}
+                          onChange={formik.handleChange}
+                        />
+                        <div className="text-left">
+                        {getFormErrorMessage('height')}
+                    </div>
+                      </div>
+                      
+                    </div>
+                    <div className="flex">
+                      <label htmlFor="name" className="mt-4 mr-8">
+                        Weight
                       </label>
                       <p className="mt-4 mr-2">:</p>
                       <div>
                         <InputText
-                          id="height"
-                          type="text"
-                          className="border-none border-bottom-2"
-                          style={{ width: "28rem" }}
-                          value={userMeasurement.height}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, height: e.target.value })}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex">
-                      <label htmlFor="name" className="mt-4 mr-3">
-                        Weight
-                      </label>
-                      <p className="mt-4 mr-3">:</p>
-                      <div>
-                        <InputText
                           id="weight"
+                          name="weight"
                           type="text"
                           className="border-none border-bottom-2"
                           style={{ width: "19rem" }}
-                          value={userMeasurement.weight}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, weight: e.target.value })}
+                          value={formik.values.weight}
+                          onChange={formik.handleChange}
                         />
+                        <div className="text-left">
+                        {getFormErrorMessage('weight')}
+                    </div>
                       </div>
+                      
                     </div>
                   </div>
                 </div>
@@ -225,9 +321,10 @@ function AddMeasurements() {
                     <InputText
                       id="shoulder"
                       type="text"
+                      name="shoulder"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.shoulder}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, shoulder: e.target.value })}
+                      value={formik.values.shoulder}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -235,11 +332,12 @@ function AddMeasurements() {
                       Front neck deep
                     </label>
                     <InputText
-                      id="frontneckdeep"
+                      id="front_neck_deep"
+                      name="front_neck_deep"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.front_neck_deep}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, front_neck_deep: e.target.value })}
+                      value={formik.values.front_neck_deep}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -247,11 +345,12 @@ function AddMeasurements() {
                       Mid waist width
                     </label>
                     <InputText
-                      id="midwaistwidth"
+                      id="mid_waist_width"
+                      name="mid_waist_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.mid_waist_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, mid_waist_width: e.target.value })}
+                      value={formik.values.mid_waist_width}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -259,11 +358,12 @@ function AddMeasurements() {
                       Armhole
                     </label>
                     <InputText
-                      id="armhole"
+                      id="arm_hole"
+                      name="arm_hole"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.arm_hole}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, arm_hole: e.target.value })}
+                      value={formik.values.arm_hole}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -271,11 +371,12 @@ function AddMeasurements() {
                       Back cross
                     </label>
                     <InputText
-                      id="backcross"
+                      id="back_cross"
+                      name="back_cross"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.back_cross}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, back_cross: e.target.value })}
+                      value={formik.values.back_cross}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -283,11 +384,12 @@ function AddMeasurements() {
                       Low waist width
                     </label>
                     <InputText
-                      id="lowwaistwidth"
+                      id="low_waist_width"
+                      name="low_waist_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.low_waist_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, low_waist_width: e.target.value })}
+                      value={formik.values.low_waist_width}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -295,11 +397,12 @@ function AddMeasurements() {
                       Upper chest width
                     </label>
                     <InputText
-                      id="upperchestwidth"
+                      id="upper_chest_width"
+                      name="upper_chest_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.upper_chest_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, upper_chest_width: e.target.value })}
+                      value={formik.values.upper_chest_width}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -307,11 +410,12 @@ function AddMeasurements() {
                       Back neck deep
                     </label>
                     <InputText
-                      id="backneckdeep"
+                      id="back_neck_deep"
+                      name="back_neck_deep"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.back_neck_deep}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, back_neck_deep: e.target.value })}
+                      value={formik.values.back_neck_deep}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -319,11 +423,12 @@ function AddMeasurements() {
                       Hip width
                     </label>
                     <InputText
-                      id="hipwidth"
+                      id="hip_width"
+                      name="hip_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.hip_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, hip_width: e.target.value })}
+                      value={formik.values.hip_width}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -331,11 +436,12 @@ function AddMeasurements() {
                       Chest width
                     </label>
                     <InputText
-                      id="chestwidth"
+                      id="chest_width"
+                      name="chest_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.chest_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, chest_width: e.target.value })}
+                      value={formik.values.chest_width}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -343,11 +449,12 @@ function AddMeasurements() {
                       High waist width
                     </label>
                     <InputText
-                      id="highwaistwidth"
+                      id="high_waist_width"
                       type="text"
+                      name="high_waist_width"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.high_waist_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, high_waist_width: e.target.value })}
+                      value={formik.values.high_waist_width}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -356,10 +463,11 @@ function AddMeasurements() {
                     </label>
                     <InputText
                       id="aasan"
+                      name="aasan"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.aasan}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, aasan: e.target.value })}
+                      value={formik.values.aasan}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -367,11 +475,12 @@ function AddMeasurements() {
                       Lower chest width
                     </label>
                     <InputText
-                      id="lowerchestwidth"
+                      id="lower_chest_width"
+                      name="lower_chest_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.lower_chest_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, lower_chest_width: e.target.value })}
+                      value={formik.values.lower_chest_width}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -379,11 +488,12 @@ function AddMeasurements() {
                       Bicep width
                     </label>
                     <InputText
-                      id="bicepwidth"
+                      id="bicep_width"
+                      name="bicep_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.bicep_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, bicep_width: e.target.value })}
+                      value={formik.values.bicep_width}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -391,11 +501,12 @@ function AddMeasurements() {
                       Thigh width
                     </label>
                     <InputText
-                      id="thighwidth"
+                      id="thigh_width"
+                      name="thigh_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.thigh_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, thigh_width: e.target.value })}
+                      value={formik.values.thigh_width}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -403,11 +514,12 @@ function AddMeasurements() {
                       Shoulder to point
                     </label>
                     <InputText
-                      id="shouldertopoint"
+                      id="shoulder_to_point"
+                      name="shoulder_to_point"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.shoulder_to_point}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, shoulder_to_point: e.target.value })}
+                      value={formik.values.shoulder_to_point}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -415,11 +527,12 @@ function AddMeasurements() {
                       Elbow width
                     </label>
                     <InputText
-                      id="elbowwidth"
+                      id="elbow_width"
+                      name="elbow_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.elbow_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, elbow_width: e.target.value })}
+                      value={formik.values.elbow_width}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -427,11 +540,12 @@ function AddMeasurements() {
                       Calves width
                     </label>
                     <InputText
-                      id="calveswidth"
+                      id="calves_width"
+                      name="calves_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.calves_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, calves_width: e.target.value })}
+                      value={formik.values.calves_width}
+                      onChange={formik.handleChange}
 
                     />
                   </div>
@@ -440,11 +554,12 @@ function AddMeasurements() {
                       Point to point
                     </label>
                     <InputText
-                      id="pointtopoint"
+                      id="point_to_point"
+                      name="point_to_point"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.point_to_point}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, point_to_point: e.target.value })}
+                      value={formik.values.point_to_point}
+                      onChange={formik.handleChange}
 
                     />
                   </div>
@@ -453,11 +568,12 @@ function AddMeasurements() {
                       Forearm width
                     </label>
                     <InputText
-                      id="forearmwidth"
+                      id="forearm_width"
+                      name="forearm_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.forearm_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, forearm_width: e.target.value })}
+                      value={formik.values.forearm_width}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -465,11 +581,12 @@ function AddMeasurements() {
                       Ankle width
                     </label>
                     <InputText
-                      id="anklewidth"
+                      id="ankle_width"
+                      name="ankle_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.ankle_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, ankle_width: e.target.value })}
+                      value={formik.values.ankle_width}
+                      onChange={formik.handleChange}
 
                     />
                   </div>
@@ -478,11 +595,12 @@ function AddMeasurements() {
                       Front cross
                     </label>
                     <InputText
-                      id="frontcross"
+                      id="front_cross"
+                      name="front_cross"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.front_cross}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, front_cross: e.target.value })}
+                      value={formik.values.front_cross}
+                      onChange={formik.handleChange}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
@@ -490,11 +608,12 @@ function AddMeasurements() {
                       Wrist width
                     </label>
                     <InputText
-                      id="wristwidth"
+                      id="wrist_width"
+                      name="wrist_width"
                       type="text"
                       style={{ width: "10rem" }}
-                      value={userMeasurement.wrist_width}
-                      onChange={(e) => setUserMeasurement({ ...userMeasurement, wrist_width: e.target.value })}
+                      value={formik.values.wrist_width}
+                      onChange={formik.handleChange}
                     />
                   </div>
                 </div>
@@ -546,10 +665,10 @@ function AddMeasurements() {
                       Yes
                     </label>
                     <Checkbox
-                    inputId="binary"
-                    className="mt-3"
-                    checked={yesChecked}
-                    onChange={(e) => setYesChecked(e.checked)}
+                      inputId="binary"
+                      className="mt-3"
+                      checked={yesChecked}
+                      onChange={(e) => setYesChecked(e.checked)}
                     />
                   </div>
                   <div className="flex my-2 justify-content-between mr-3" style={{ width: "93px" }}>
@@ -557,10 +676,10 @@ function AddMeasurements() {
                       No
                     </label>
                     <Checkbox
-                    inputId="binary"
-                    className="mt-3"
-                    checked={noChecked}
-                    onChange={(e) => setNoChecked(e.checked)}
+                      inputId="binary"
+                      className="mt-3"
+                      checked={noChecked}
+                      onChange={(e) => setNoChecked(e.checked)}
                     />
                   </div>
 
@@ -581,16 +700,17 @@ function AddMeasurements() {
                     {/* Top Length */}
 
                     <div className="my-2">
-                      <div style={{ marginBottom: "185px" }}>
+                      <div style={{ marginBottom: "180px" }}>
                         <h1 className="text-left">Top length</h1>
                       </div>
                       <div className="flex my-1 mr-8" style={{ width: "310px" }}>
                         <InputText
-                          id="blouselength"
+                          id="blouse_length"
+                          name="blouse_length"
                           type="text"
                           style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.blouse_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, blouse_length: e.target.value })}
+                          value={formik.values.blouse_length}
+                          onChange={formik.handleChange}
                         />
                         <label htmlFor="name" className="mt-2 ml-4 text-left">
                           Blouse length
@@ -598,11 +718,12 @@ function AddMeasurements() {
                       </div>
                       <div className="flex my-1 mr-8" style={{ width: "330px" }}>
                         <InputText
-                          id="croptoplength"
+                          id="crop_top_length"
+                          name="crop_top_length"
                           type="text"
                           style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.crop_top_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, crop_top_length: e.target.value })}
+                          value={formik.values.crop_top_length}
+                          onChange={formik.handleChange}
                         />
                         <label htmlFor="name" className="mt-2 ml-4 text-left">
                           Crop top length
@@ -610,11 +731,12 @@ function AddMeasurements() {
                       </div>
                       <div className="flex my-1 mr-8" style={{ width: "330px" }}>
                         <InputText
-                          id="waistlength"
+                          id="waist_length"
+                          name="waist_length"
                           type="text"
                           style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.waist_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, waist_length: e.target.value })}
+                          value={formik.values.waist_length}
+                          onChange={formik.handleChange}
                         />
                         <label htmlFor="name" className="mt-2 ml-4">
                           Waist length
@@ -622,76 +744,17 @@ function AddMeasurements() {
                       </div>
                       <div className="flex mt-1 mr-8" style={{ width: "330px", marginBottom: "35px" }}>
                         <InputText
-                          id="hiplength"
+                          id="hip_length"
+                          name="hip_length"
                           type="text"
                           style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.hip_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, hip_length: e.target.value })}
+                          value={formik.values.hip_length}
+                          onChange={formik.handleChange}
                         />
                         <label htmlFor="name" className="mt-2 ml-4">
                           Hip length
                         </label>
                       </div>
-                      {/* <div className="flex mr-8" style={{ width: "330px", marginBottom: "35px" }}>
-                        <InputText
-                          id="midthighlength"
-                          type="text"
-                          style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.mid_thigh_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, mid_thigh_length: e.target.value })}
-                        />
-                        <label htmlFor="name" className="mt-2 ml-4">
-                          Mid thigh length
-                        </label>
-                      </div>
-                      <div className="flex mr-8" style={{ width: "330px", marginBottom: "30px" }}>
-                        <InputText
-                          id="kneelength"
-                          type="text"
-                          style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.knee_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, knee_length: e.target.value })}
-                        />
-                        <label htmlFor="name" className="mt-2 ml-4">
-                          Knee length
-                        </label>
-                      </div>
-                      <div className="flex mr-8" style={{ width: "330px", marginBottom: "50px" }}>
-                        <InputText
-                          id="calveslength"
-                          type="text"
-                          style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.calves_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, calves_length: e.target.value })}
-                        />
-                        <label htmlFor="name" className="mt-2 ml-4">
-                          Calves length
-                        </label>
-                      </div>
-                      <div className="flex mr-8" style={{ width: "330px", marginBottom: "40px" }}>
-                        <InputText
-                          id="anklelength"
-                          type="text"
-                          style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.ankle_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, ankle_length: e.target.value })}
-                        />
-                        <label htmlFor="name" className="mt-2 ml-4">
-                          Ankle length
-                        </label>
-                      </div>
-                      <div className="flex my-2 mr-8" style={{ width: "330px" }}>
-                        <InputText
-                          id="floorlength"
-                          type="text"
-                          style={{ width: "11rem", height: "40px" }}
-                          value={userMeasurement.floor_length}
-                          onChange={(e) => setUserMeasurement({ ...userMeasurement, floor_length: e.target.value })}
-                        />
-                        <label htmlFor="name" className="mt-2 ml-4">
-                          Floor length
-                        </label>
-                      </div> */}
 
                     </div>
 
@@ -716,11 +779,12 @@ function AddMeasurements() {
                         <div>
                           <div className="flex mt-7 mr-8" style={{ width: "350px", marginBottom: "30px" }}>
                             <InputText
-                              id="biceplength"
+                              id="bicep_length"
+                              name="bicep_length"
                               type="text"
                               style={{ width: "11rem", height: "40px" }}
-                              value={userMeasurement.bicep_length}
-                              onChange={(e) => setUserMeasurement({ ...userMeasurement, bicep_length: e.target.value })}
+                              value={formik.values.bicep_length}
+                              onChange={formik.handleChange}
                             />
                             <label htmlFor="name" className="mt-2 ml-4 text-left">
                               Bicep length
@@ -728,11 +792,12 @@ function AddMeasurements() {
                           </div>
                           <div className="flex mr-8" style={{ width: "350px", marginBottom: "30px" }}>
                             <InputText
-                              id="elbowlength"
+                              id="elbow_length"
+                              name="elbow_length"
                               type="text"
                               style={{ width: "11rem", height: "40px" }}
-                              value={userMeasurement.elbow_length}
-                              onChange={(e) => setUserMeasurement({ ...userMeasurement, elbow_length: e.target.value })}
+                              value={formik.values.elbow_length}
+                              onChange={formik.handleChange}
                             />
                             <label htmlFor="name" className="mt-2 ml-4">
                               Elbow length
@@ -740,11 +805,12 @@ function AddMeasurements() {
                           </div>
                           <div className="flex mr-8" style={{ width: "350px", marginBottom: "20px" }}>
                             <InputText
-                              id="forearmlength"
+                              id="forearm_length"
+                              name="forearm_length"
                               type="text"
                               style={{ width: "11rem", height: "40px" }}
-                              value={userMeasurement.forearm_length}
-                              onChange={(e) => setUserMeasurement({ ...userMeasurement, forearm_length: e.target.value })}
+                              value={formik.values.forearm_length}
+                              onChange={formik.handleChange}
                             />
                             <label htmlFor="name" className="mt-2 ml-4">
                               Forearm length
@@ -752,11 +818,12 @@ function AddMeasurements() {
                           </div>
                           <div className="flex my-2 mr-8" style={{ width: "350px" }}>
                             <InputText
-                              id="fullsleeveslength"
+                              id="full_sleeves_length"
+                              name="full_sleeves_length"
                               type="text"
                               style={{ width: "11rem", height: "40px" }}
-                              value={userMeasurement.full_sleeves_length}
-                              onChange={(e) => setUserMeasurement({ ...userMeasurement, full_sleeves_length: e.target.value })}
+                              value={formik.values.full_sleeves_length}
+                              onChange={formik.handleChange}
                             />
                             <label htmlFor="name" className="mt-2 ml-4">
                               Full sleeves length
@@ -781,11 +848,12 @@ function AddMeasurements() {
                         <div className="mt-8">
                           <div className="flex mr-8 mt-4" style={{ width: "330px", marginBottom: "15px" }}>
                             <InputText
-                              id="midthighlength"
+                              id="mid_thigh_length"
+                              name="mid_thigh_length"
                               type="text"
                               style={{ width: "11rem", height: "40px" }}
-                              value={userMeasurement.mid_thigh_length}
-                              onChange={(e) => setUserMeasurement({ ...userMeasurement, mid_thigh_length: e.target.value })}
+                              value={formik.values.mid_thigh_length}
+                              onChange={formik.handleChange}
                             />
                             <label htmlFor="name" className="mt-2 ml-4">
                               Mid thigh length
@@ -793,11 +861,12 @@ function AddMeasurements() {
                           </div>
                           <div className="flex mr-8" style={{ width: "330px", marginBottom: "15px" }}>
                             <InputText
-                              id="kneelength"
+                              id="knee_length"
+                              name="knee_length"
                               type="text"
                               style={{ width: "11rem", height: "40px" }}
-                              value={userMeasurement.knee_length}
-                              onChange={(e) => setUserMeasurement({ ...userMeasurement, knee_length: e.target.value })}
+                              value={formik.values.knee_length}
+                              onChange={formik.handleChange}
                             />
                             <label htmlFor="name" className="mt-2 ml-4">
                               Knee length
@@ -805,11 +874,12 @@ function AddMeasurements() {
                           </div>
                           <div className="flex mr-8" style={{ width: "330px", marginBottom: "15px" }}>
                             <InputText
-                              id="calveslength"
+                              id="calves_length"
+                              name="calves_length"
                               type="text"
                               style={{ width: "11rem", height: "40px" }}
-                              value={userMeasurement.calves_length}
-                              onChange={(e) => setUserMeasurement({ ...userMeasurement, calves_length: e.target.value })}
+                              value={formik.values.calves_length}
+                              onChange={formik.handleChange}
                             />
                             <label htmlFor="name" className="mt-2 ml-4">
                               Calves length
@@ -817,11 +887,12 @@ function AddMeasurements() {
                           </div>
                           <div className="flex mr-8" style={{ width: "330px", marginBottom: "15px" }}>
                             <InputText
-                              id="anklelength"
+                              id="ankle_length"
+                              name="ankle_length"
                               type="text"
                               style={{ width: "11rem", height: "40px" }}
-                              value={userMeasurement.ankle_length}
-                              onChange={(e) => setUserMeasurement({ ...userMeasurement, ankle_length: e.target.value })}
+                              value={formik.values.ankle_length}
+                              onChange={formik.handleChange}
                             />
                             <label htmlFor="name" className="mt-2 ml-4">
                               Ankle length
@@ -829,11 +900,12 @@ function AddMeasurements() {
                           </div>
                           <div className="flex mr-8" style={{ width: "330px" }}>
                             <InputText
-                              id="floorlength"
+                              id="floor_length"
+                              name="floor_length"
                               type="text"
                               style={{ width: "11rem", height: "40px" }}
-                              value={userMeasurement.floor_length}
-                              onChange={(e) => setUserMeasurement({ ...userMeasurement, floor_length: e.target.value })}
+                              value={formik.values.floor_length}
+                              onChange={formik.handleChange}
                             />
                             <label htmlFor="name" className="mt-2 ml-4">
                               Floor length
@@ -848,7 +920,7 @@ function AddMeasurements() {
             </div>
           </div>
 
-          <Button type="submit" label="Submit" onClick={handleClick} className="my-2 w-15rem" />
+          <Button type="submit" label="Submit" className="my-2 w-15rem" />
 
         </form>
       </div>
