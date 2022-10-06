@@ -1,33 +1,48 @@
 import { Divider } from "primereact/divider";
-import React, { useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useFormik } from "formik";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
-import { Dropdown } from "primereact/dropdown";
-import { Calendar } from "primereact/calendar";
+import { createUser } from "../../../api/api";
 import { Password } from "primereact/password";
-import { Checkbox } from "primereact/checkbox";
-import { Dialog } from "primereact/dialog";
-import { classNames } from "primereact/utils";
+import { Toast } from "primereact/toast";
 
 function AddNewUser() {
-  const [countries, setCountries] = useState([]);
-  const [showMessage, setShowMessage] = useState(false);
   const [formData, setFormData] = useState({});
+  const toast = useRef(null);
+  const showSuccess = () => {
+    toast.current.show({
+      severity: "success",
+      summary: "Success ",
+      detail: "User Created Successfully",
+      life: 3000,
+    });
+  };
+  const showError = (message) => {
+    toast.current.show({
+      severity: "error",
+      summary: "Error Message",
+      detail: message,
+      life: 3000,
+    });
+  };
+
   const formik = useFormik({
     initialValues: {
-      name: "",
+      first_name: "",
+      last_name: "",
       email: "",
       password: "",
-      date: null,
-      country: null,
-      accept: false,
+      phone_number: "",
     },
     validate: (data) => {
       let errors = {};
 
-      if (!data.name) {
-        errors.name = "Name is required.";
+      if (!data.first_name) {
+        errors.first_name = "Name is required.";
+      }
+      if (!data.last_name) {
+        errors.last_name = "Name is required.";
       }
 
       if (!data.email) {
@@ -42,20 +57,25 @@ function AddNewUser() {
         errors.password = "Password is required.";
       }
 
-      if (!data.accept) {
-        errors.accept = "You need to agree to the terms and conditions.";
+      if (!data.phone_number) {
+        errors.phone_number = "Phone Number is Required";
       }
 
       return errors;
     },
     onSubmit: (data) => {
       setFormData(data);
-      setShowMessage(true);
-
-      formik.resetForm();
+      createUser(data)
+        .then((res) => {
+          showSuccess();
+          console.log("success", res);
+        })
+        .catch((err) => {
+          showError(err.response.data.message);
+          console.log("Error", err);
+        });
     },
   });
-
 
   const passwordHeader = <h6>Pick a password</h6>;
   const passwordFooter = (
@@ -76,6 +96,7 @@ function AddNewUser() {
       <Divider className="mt-3" align="center">
         <h2>Add New User</h2>
       </Divider>
+      <Toast ref={toast} />
       <div className="flex justify-content-center m-3">
         <form onSubmit={formik.handleSubmit} className="p-fluid">
           <div className="flex">
@@ -83,13 +104,25 @@ function AddNewUser() {
               <div className="field mb-5 ">
                 <span className="p-float-label">
                   <InputText
-                    id="name"
-                    name="name"
-                    value={formik.values.name}
+                    id="first_name"
+                    name="first_name"
+                    value={formik.values.first_name}
                     onChange={formik.handleChange}
                     autoFocus
                   />
-                  <label htmlFor="name">Name*</label>
+                  <label htmlFor="first_name">First Name*</label>
+                </span>
+              </div>
+              <div className="field mb-5 ">
+                <span className="p-float-label">
+                  <InputText
+                    id="last_name"
+                    name="last_name"
+                    value={formik.values.last_name}
+                    onChange={formik.handleChange}
+                    autoFocus
+                  />
+                  <label htmlFor="last_name">Last Name*</label>
                 </span>
               </div>
               <div className="field mb-5">
@@ -118,108 +151,21 @@ function AddNewUser() {
                   <label htmlFor="password">Password*</label>
                 </span>
               </div>
+
               <div className="field mb-5">
                 <span className="p-float-label">
-                  <Calendar
-                    id="date"
-                    name="date"
-                    value={formik.values.date}
-                    onChange={formik.handleChange}
-                    dateFormat="dd/mm/yy"
-                    mask="99/99/9999"
-                    showIcon
-                  />
-                  <label htmlFor="date">Birthday</label>
-                </span>
-              </div>
-              <div className="field mb-5">
-                <span className="p-float-label">
-                  <Dropdown
-                    id="gender"
-                    name="gender"
+                  <InputText
+                    id="phone_number"
+                    name="phone_number"
+                    type="number"
                     value={formik.values.date}
                     onChange={formik.handleChange}
                   />
-                  <label htmlFor="gender">Gender</label>
-                </span>
-              </div>
-            </div>
-            <div className="card w-30rem mx-5">
-              <div className="field mb-5 ">
-                <span className="p-float-label">
-                  <InputText
-                    id="name"
-                    name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    autoFocus
-                  />
-                  <label htmlFor="name">Profile Name*</label>
-                </span>
-              </div>
-              <div className="field mb-5 ">
-                <span className="p-float-label">
-                  <InputText
-                    id="name"
-                    name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    autoFocus
-                  />
-                  <label htmlFor="name">Height*</label>
-                </span>
-              </div>
-              <div className="field mb-5 ">
-                <span className="p-float-label">
-                  <InputText
-                    id="name"
-                    name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    autoFocus
-                  />
-                  <label htmlFor="name">Weight*</label>
-                </span>
-              </div>
-              <div className="field mb-5 ">
-                <span className="p-float-label">
-                  <InputText
-                    id="name"
-                    name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    autoFocus
-                  />
-                  <label htmlFor="name">Age*</label>
-                </span>
-              </div>
-              <div className="field mb-5 ">
-                <span className="p-float-label">
-                  <InputText
-                    id="name"
-                    name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    autoFocus
-                  />
-                  <label htmlFor="name">If Female - then Breast Size*</label>
+                  <label htmlFor="phone_number">Phone Number</label>
                 </span>
               </div>
             </div>
           </div>
-
-          <div className="mb-2 ">
-            <Checkbox
-              inputId="accept"
-              name="accept"
-              checked={formik.values.accept}
-              onChange={formik.handleChange}
-            />
-            <label className="ml-2" htmlFor="accept">
-              I agree to the terms and conditions*
-            </label>
-          </div>
-
           <Button type="submit" label="Add New User" className="mt-2 w-30rem" />
         </form>
       </div>
