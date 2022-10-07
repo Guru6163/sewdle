@@ -6,15 +6,17 @@ import { Button } from "primereact/button";
 import { createUser } from "../../../api/api";
 import { Password } from "primereact/password";
 import { Toast } from "primereact/toast";
+import { useNavigate } from "react-router-dom";
 
 function AddNewUser() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({});
   const toast = useRef(null);
   const showSuccess = () => {
     toast.current.show({
       severity: "success",
-      summary: "Success ",
-      detail: "User Created Successfully",
+      summary: "User Created Successfully ",
+      detail: "You will be redirected to the All User Page",
       life: 3000,
     });
   };
@@ -69,6 +71,9 @@ function AddNewUser() {
         .then((res) => {
           showSuccess();
           console.log("success", res);
+          setTimeout(() => {
+            navigate("/users/allUsers");
+          }, 3000);
         })
         .catch((err) => {
           showError(err.response.data.message);
