@@ -83,7 +83,11 @@ function FabricDetail() {
           label="Delete Fabric"
           onClick={(event) => confirm2(event, params)}
         ></Button>
-        <Button className="m-2  w-20rem" label="Update Fabric"></Button>
+        <Button
+          onClick={() => navigate("update")}
+          className="m-2  w-20rem"
+          label="Update Fabric"
+        ></Button>
       </div>
     </div>
   );

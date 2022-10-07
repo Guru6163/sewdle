@@ -33,6 +33,18 @@ const addFabric = async (body) => {
   );
   return response;
 }
+const updateFabric = async (body, id) => {
+  const response = await axios.put(`${process.env.REACT_APP_BACKEND_BASE_URL}/admin/fabric/${id}`,
+    body,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`
+      }
+    }
+  );
+  return response;
+}
 const deleteFabric = async (id) => {
   const response = await axios.delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/admin/fabric/${id}`,
     {
@@ -117,5 +129,6 @@ export {
   getAllFabrics,
   getAllOrders,
   addFabric,
-  deleteFabric
+  deleteFabric,
+  updateFabric
 };

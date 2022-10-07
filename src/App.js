@@ -22,6 +22,7 @@ import AddNewUser from "./pages/users/components/AddNewUser";
 import AddMeasurements from "./pages/users/components/AddMeasurement";
 import { DefaultOutlet, NestedOutlet } from "./components/Outlet";
 import EditMeasurement from "./pages/users/components/EditMeasurement";
+import UpdateFabric from "./pages/fabrics/components/UpdateFabric";
 
 function App() {
   return (
@@ -53,7 +54,10 @@ function App() {
           <Route path="fabrics" element={<Fabrics />}>
             <Route path="all" element={<ListAllFabrics />} />
             <Route path="new" element={<AddNewFabric />} />
-            <Route path=":id" element={<FabricDetail />} />
+            <Route path=":id" element={<NestedOutlet />} >
+              <Route path="" element={<FabricDetail />} ></Route>
+              <Route path="update" element={<UpdateFabric />} ></Route>
+            </Route>
           </Route>
           <Route path="collections" element={<Collections />}>
             <Route path="all" element={<ListAllCollections />} />
