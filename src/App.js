@@ -20,6 +20,8 @@ import ListFabricOrders from "./pages/orders/components/ListFabricOrders";
 import Users from "./pages/users/Users";
 import AddNewUser from "./pages/users/components/AddNewUser";
 import AddMeasurements from "./pages/users/components/AddMeasurement";
+import { DefaultOutlet, NestedOutlet } from "./components/Outlet";
+import EditMeasurement from "./pages/users/components/EditMeasurement";
 
 function App() {
   return (
@@ -28,11 +30,25 @@ function App() {
       <div>
         <Routes>
           <Route path="" element={<Login />} />
-          <Route path="users" element={<Users />}>
+
+          <Route path="users" element={<DefaultOutlet />}>
+            <Route path="" element={<Users />}>
+              <Route path="" element={<NestedOutlet />}>
+                <Route path="allUsers" element={<NestedOutlet />}  >
+                  <Route path="" element={<ListAllUsers />}></Route>
+                  <Route path=":id" element={<EditMeasurement />}></Route>
+                </Route>
+                <Route path="addUsers" element={<AddNewUser />} />
+                <Route path="addMeasurements" element={<AddMeasurements />} />
+              </Route>
+            </Route>
+          </Route>
+
+          {/* <Route path="users" element={<Users />}>
             <Route path="allUsers" element={<ListAllUsers />} />
             <Route path="addUsers" element={<AddNewUser />} />
             <Route path="addMeasurements" element={<AddMeasurements />} />
-          </Route>
+          </Route> */}
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="fabrics" element={<Fabrics />}>
             <Route path="all" element={<ListAllFabrics />} />

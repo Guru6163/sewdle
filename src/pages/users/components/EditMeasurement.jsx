@@ -6,18 +6,15 @@ import { Button } from "primereact/button";
 import { Image } from "primereact/image";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
-import { Calendar } from "primereact/calendar";
-import { Password } from "primereact/password";
 import { Checkbox } from "primereact/checkbox";
-import { Dialog } from "primereact/dialog";
-import { classNames } from "primereact/utils";
 import bodyImage from "./images/figures-01.png";
 import sleeveImage from "./images/figures-02.png";
 import bottomImage from "./images/figures-03.png";
-import { addMeasurement, getAllUsers } from "../../../api/api";
+import { useNavigate } from "react-router-dom";
 
-function AddMeasurements() {
+function EditMeasurement() {
   const [formData, setFormData] = useState({});
+  const navigate = useNavigate();
   const [yesChecked, setYesChecked] = useState(false);
   const [noChecked, setNoChecked] = useState(false);
 
@@ -111,9 +108,10 @@ function AddMeasurements() {
       const { user_name, ...rest } = data;
       setFormData(data);
       console.log("Formdata", formData);
-      addMeasurement(rest, userID)
-        .then((res) => showSuccess())
-        .catch((err) => showError());
+
+      // addMeasurement(rest, userID)
+      //   .then((res) => showSuccess())
+      //   .catch((err) => showError());
     },
   });
 
@@ -129,17 +127,23 @@ function AddMeasurements() {
   };
 
   useEffect(() => {
-    getAllUsers().then((data) => {
-      setUsers(data.data);
-    });
+    //   getAllUsers().then((data) => {
+    //     setUsers(data.data);
+    //   });
   }, []);
 
   return (
     <div>
       <Toast ref={toast} />
-      <Divider className="mt-5" align="center">
-        <h2>Add Measurements</h2>
-      </Divider>
+      <div className="text-left flex justify-content-center align-items-center">
+        {/* <Button
+          className="mx-2"
+          style={{ width: "180px" }}
+          label="Go Back"
+        ></Button> */}
+        <h2 className="mx-2">Edit Measurements</h2>
+      </div>
+
       <div className="flex flex-start">
         <form onSubmit={formik.handleSubmit} className="p-fluid">
           <div style={{ width: "98.9vw" }}>
@@ -148,18 +152,21 @@ function AddMeasurements() {
                 className="flex justify-content-between"
                 style={{ width: "100%" }}
               >
-                <div className="flex-wrap" style={{ width: "80%" }}>
-                  <div className=" container flex my-2">
-                    <label
-                      htmlFor="name"
-                      className="mt-4"
-                      style={{ marginRight: "45px" }}
-                    >
+                <div className="flex-wrap mt-3" style={{ width: "80%" }}>
+                  <div className="container flex flex-row my-2 justify-content-start align-items-center ">
+                    <label htmlFor="name" style={{ marginRight: "45px" }}>
                       User Name
                     </label>
-                    <p className="mt-4 mr-2">:</p>
+                    <p className="mr-2">:</p>
                     <div>
-                      <Dropdown
+                      {formik.values.profile_name}
+                      <InputText
+                        disabled
+                        type="text"
+                        className="border-none border-bottom-2 p-inputtext-sm"
+                        style={{ width: "19rem" }}
+                      />
+                      {/* <Dropdown
                         id="user_name"
                         name="user_name"
                         value={formik.values.user_name}
@@ -172,21 +179,21 @@ function AddMeasurements() {
                         }}
                         optionLabel="first_name"
                         placeholder="Select a User"
-                      />
+                      /> */}
                       {getFormErrorMessage("user_name")}
                     </div>
                   </div>
-                  <div className=" container flex my-2">
-                    <label htmlFor="name" className="mt-4 mr-5">
+                  <div className="container flex flex-row my-2 justify-content-start align-items-center ">
+                    <label htmlFor="name" className=" mr-5">
                       Profile Name
                     </label>
-                    <p className="mt-4 mr-2">:</p>
+                    <p className=" mr-2">:</p>
                     <div>
                       <InputText
                         id="profile_name"
                         name="profile_name"
                         type="text"
-                        className="border-none border-bottom-2"
+                        className="border-none border-bottom-2 p-inputtext-sm"
                         style={{ width: "19rem" }}
                         value={formik.values.profile_name}
                         onChange={formik.handleChange}
@@ -196,21 +203,21 @@ function AddMeasurements() {
                       </div>
                     </div>
                   </div>
-                  <div className=" container flex my-2">
+                  <div className=" container flex flex-row my-2 justify-content-start align-items-center">
                     <label
                       htmlFor="name"
-                      className="mt-4"
+                      className=""
                       style={{ marginRight: "102px" }}
                     >
                       Age
                     </label>
-                    <p className="mt-4 mr-2">:</p>
+                    <p className=" mr-2">:</p>
                     <div>
                       <InputText
                         id="age"
                         name="age"
                         type="text"
-                        className="border-none border-bottom-2"
+                        className="border-none border-bottom-2 p-inputtext-sm"
                         style={{ width: "19rem" }}
                         value={formik.values.age}
                         onChange={formik.handleChange}
@@ -220,15 +227,15 @@ function AddMeasurements() {
                       </div>
                     </div>
                   </div>
-                  <div className=" container flex my-2">
+                  <div className=" container flex flex-row my-2 justify-content-start align-items-center">
                     <label
                       htmlFor="name"
-                      className="mt-4"
+                      className=""
                       style={{ marginRight: "75px" }}
                     >
                       Gender
                     </label>
-                    <p className="mt-4 mr-2">:</p>
+                    <p className=" mr-2">:</p>
                     <div>
                       <Dropdown
                         id="gender"
@@ -240,7 +247,7 @@ function AddMeasurements() {
                         ]}
                         optionLabel="name"
                         optionValue="field"
-                        className="border-none border-bottom-2"
+                        className="border-none border-bottom-2 p-inputtext-sm"
                         style={{ width: "19rem" }}
                         value={formik.values.gender}
                         onChange={formik.handleChange}
@@ -1005,11 +1012,15 @@ function AddMeasurements() {
             </div>
           </div>
 
-          <Button type="submit" label="Submit" className="my-2 w-15rem" />
+          <Button
+            type="submit"
+            label="Update Measurements"
+            className="my-2 w-15rem"
+          />
         </form>
       </div>
     </div>
   );
 }
 
-export default AddMeasurements;
+export default EditMeasurement;

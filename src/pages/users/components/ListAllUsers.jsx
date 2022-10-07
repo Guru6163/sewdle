@@ -5,6 +5,7 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { useEffect } from "react";
 import { getAllUsers } from "../../../api/api";
+import { useNavigate } from "react-router-dom";
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
@@ -12,6 +13,7 @@ import { deleteUser } from "../../../api/api";
 
 function ListAllUsers() {
   const toast = useRef(null);
+  const navigate = useNavigate();
   const [update, setUpdate] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   useEffect(() => {
@@ -117,6 +119,12 @@ function ListAllUsers() {
       <div className="m-3">
         <ConfirmPopup />
         <DataTable
+          rowHover
+          onRowClick={(e) => {
+            console.log(e);
+            navigate(`${e.data.id}`);
+          }}
+          selectionMode="single"
           header={header}
           showGridlines
           paginator
