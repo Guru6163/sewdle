@@ -6,25 +6,16 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { useNavigate } from "react-router-dom";
 import { TabMenu } from "primereact/tabmenu";
+import { getAllOrders } from "../../../api/api";
 import { ProgressSpinner } from "primereact/progressspinner";
 
 function ListAllOrders() {
-  const dummy = {
-    _id: "b98696fa-14b7-4d38-aa3b-7e393dfb7ebe",
-    email: "sbackshall0@stanford.edu",
-    name: "Sandor",
-    mobileNumber: "9287876668",
-    discountPercentage: 10,
-    creditPeriod: 3,
-    userType: "admin",
-  };
+  const [allOrders, setAllorders] = useState([]);
+  console.log(allOrders);
+  useEffect(() => {
+    getAllOrders().then((res) => setAllorders(res.data));
+  }, []);
 
-  const [data, setData] = useState(
-    Array(10)
-      .fill(0)
-      .map((x) => Object.assign({}, dummy))
-  );
-  console.log(data);
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between align-items-center">
@@ -43,25 +34,36 @@ function ListAllOrders() {
         <DataTable
           header={header}
           showGridlines
-          value={data}
+          value={allOrders}
           paginator
           className=""
           rows={10}
         >
-          <Column field="email" header="Email"></Column>
-          <Column field="name" header="Name"></Column>
+          <Column field="order_display_id" header="Order ID"></Column>
+          <Column field="user.email" header="Email"></Column>
+          <Column field="user.first_name" header="Name"></Column>
           <Column
             align="center"
-            field="mobileNumber"
+            field="user.phone_number"
             header="Mobile Number"
           ></Column>
-          <Column align="center" field="userType" header="User Type"></Column>
           <Column
             align="center"
-            field="discountPercentage"
-            header="Discount Percentage"
+            bodyClassName="capitalize"
+            field="order_type"
+            header="Order Type"
           ></Column>
-          <Column align="center" field="userType" header="User Type"></Column>
+          <Column
+            align="center"
+            bodyClassName="capitalize"
+            field="payment_status"
+            header="Payment Status"
+          ></Column>
+          <Column
+            align="center"
+            field="razorpay_payment_id"
+            header="Payment ID"
+          ></Column>
         </DataTable>
       </div>
     </div>

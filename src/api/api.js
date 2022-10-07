@@ -46,6 +46,18 @@ const getAllFabrics = async () => {
   );
   return response;
 };
+const getAllOrders = async () => {
+  const response = await axios.get(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/order`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
 const createUser = async (data) => {
   const response = await axios.post(
     `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/user/`,
@@ -79,5 +91,6 @@ export {
   createUser,
   deleteUser,
   addMeasurement,
-  getAllFabrics
+  getAllFabrics,
+  getAllOrders
 };
