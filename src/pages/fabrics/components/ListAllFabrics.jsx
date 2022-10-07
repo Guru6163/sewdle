@@ -36,7 +36,7 @@ function ListAllFabrics() {
               alt={data.name}
             />
             <div className="p-1">
-              <div className="product-name font-bold">{data.fabric_type}</div>
+              <div className="product-name font-bold capitalize">{data.fabric_type}</div>
               <div className="product-name">
                 {/* Stocks : {data.stock} Rs */}
                 <div>Cost Per Metre : {data.cost_per_metre}</div>
