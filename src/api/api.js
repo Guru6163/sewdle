@@ -21,6 +21,19 @@ const addMeasurement = async (body, id) => {
   );
   return response;
 }
+const addFabric = async (body) => {
+  const response = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/admin/fabric`,
+    body,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`
+      }
+    }
+  );
+  return response;
+}
+
 
 const getAllUsers = async () => {
   const response = await axios.get(
@@ -92,5 +105,6 @@ export {
   deleteUser,
   addMeasurement,
   getAllFabrics,
-  getAllOrders
+  getAllOrders,
+  addFabric
 };

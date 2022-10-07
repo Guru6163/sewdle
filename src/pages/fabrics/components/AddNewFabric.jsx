@@ -1,223 +1,169 @@
 import { Divider } from "primereact/divider";
 import React, { useRef, useState } from "react";
 import { Toast } from "primereact/toast";
-import { FileUpload } from "primereact/fileupload";
-
 import { useFormik } from "formik";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
-import { Dropdown } from "primereact/dropdown";
-import { Calendar } from "primereact/calendar";
-import { Password } from "primereact/password";
+import { addFabric } from "../../../api/api";
 
 function AddNewFabric() {
-  const [countries, setCountries] = useState([]);
-  const [showMessage, setShowMessage] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [image, setImage] = useState([]);
+  const toast = useRef(null);
+  const showSuccess = () => {
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Fabric Added Successfully",
+      life: 3000,
+    });
+  };
+  const showError = () => {
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: "Error Adding the Fabric",
+      life: 3000,
+    });
+  };
+
   const formik = useFormik({
     initialValues: {
-      name: "",
-      email: "",
-      password: "",
-      date: null,
-      country: null,
-      accept: false,
+      fabric_type: "",
+      cost_per_metre: "",
+      stock: "",
+      color: "",
+      tags: ["f107bc48-a81e-4fc3-bd94-52a8b67e7001"],
     },
     validate: (data) => {
       let errors = {};
 
-      if (!data.name) {
-        errors.name = "Name is required.";
+      if (!data.fabric_type) {
+        errors.fabric_type = "Fabric Type is required.";
       }
 
-      if (!data.email) {
-        errors.email = "Email is required.";
-      } else if (
-        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(data.email)
-      ) {
-        errors.email = "Invalid email address. E.g. example@email.com";
+      if (!data.cost_per_metre) {
+        errors.cost_per_metre = "Cost Per Metre is required.";
       }
 
-      if (!data.password) {
-        errors.password = "Password is required.";
+      if (!data.stock) {
+        errors.stock = "Stock is required.";
       }
 
-      if (!data.accept) {
-        errors.accept = "You need to agree to the terms and conditions.";
+      if (!data.color) {
+        errors.color = "Color is Required";
+      }
+      if (!data.tags) {
+        errors.tags = "Tag is Required";
       }
 
       return errors;
     },
     onSubmit: (data) => {
-      setFormData(data);
-      setShowMessage(true);
-
-      formik.resetForm();
+      const formdata = new FormData();
+      formdata.append("fabric_type", data.fabric_type);
+      formdata.append("cost_per_metre", JSON.stringify(data.cost_per_metre));
+      formdata.append("stock", JSON.stringify(data.stock));
+      formdata.append("color", data.color);
+      formdata.append("tags", "f107bc48-a81e-4fc3-bd94-52a8b67e7001");
+      formdata.append("tags", "b21c2a0f-6c0d-41e5-83a0-5c69ee9a5820");
+      formdata.append("image", image[0]);
+      addFabric(formdata)
+        .then((res) => {
+          showSuccess();
+          formik.resetForm();
+        })
+        .catch((err) => showError());
     },
   });
-
-  const dialogFooter = (
-    <div className="flex justify-content-center">
-      <Button
-        label="OK"
-        className="p-button-text"
-        autoFocus
-        onClick={() => setShowMessage(false)}
-      />
-    </div>
-  );
-  const passwordHeader = <h6>Pick a password</h6>;
-  const passwordFooter = (
-    <React.Fragment>
-      <Divider />
-      <p className="mt-2">Suggestions</p>
-      <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: "1.5" }}>
-        <li>At least one lowercase</li>
-        <li>At least one uppercase</li>
-        <li>At least one numeric</li>
-        <li>Minimum 8 characters</li>
-      </ul>
-    </React.Fragment>
-  );
-
+  console.log(formik.errors);
   return (
     <div>
-      <Divider className="mt-5" align="center">
-        <h2>Add New Fabric</h2>
-      </Divider>
+      <h2 className="mb-4">Add Fabrics</h2>
+      <Toast ref={toast} />
       <div className="flex justify-content-center">
         <form onSubmit={formik.handleSubmit} className="p-fluid">
           <div className="flex">
             <div className="card w-30rem mx-5 ">
               <div className="field mb-5 ">
                 <span className="p-float-label">
-                  <Dropdown
-                    id="name"
-                    name="name"
-                    value={formik.values.name}
+                  <InputText
+                    id="fabric_type"
+                    name="fabric_type"
+                    value={formik.values.fabric_type}
                     onChange={formik.handleChange}
                     autoFocus
                   />
-                  <label htmlFor="name">Select User*</label>
+                  <label htmlFor="fabric_type">Fabric Type*</label>
                 </span>
               </div>
               <div className="field mb-5">
                 <span className="p-float-label p-input-icon-right">
                   <i className="pi pi-envelope" />
                   <InputText
-                    id="email"
-                    name="email"
-                    value={formik.values.email}
+                    id="cost_per_metre"
+                    name="cost_per_metre"
+                    type="number"
+                    value={formik.values.cost_per_metre}
                     onChange={formik.handleChange}
                   />
-                  <label htmlFor="email">Email*</label>
+                  <label htmlFor="cost_per_metre">Cost Per Metre*</label>
                 </span>
               </div>
-              <div className="field mb-5">
-                <span className="p-float-label">
-                  <Password
-                    id="password"
-                    name="password"
-                    value={formik.values.password}
-                    onChange={formik.handleChange}
-                    toggleMask
-                    header={passwordHeader}
-                    footer={passwordFooter}
-                  />
-                  <label htmlFor="password">Password*</label>
-                </span>
-              </div>
-              <div className="field mb-5">
-                <span className="p-float-label">
-                  <Calendar
-                    id="date"
-                    name="date"
-                    value={formik.values.date}
-                    onChange={formik.handleChange}
-                    dateFormat="dd/mm/yy"
-                    mask="99/99/9999"
-                    showIcon
-                  />
-                  <label htmlFor="date">Birthday</label>
-                </span>
-              </div>
-              <div className="field mb-5">
-                <span className="p-float-label">
-                  <Dropdown
-                    id="gender"
-                    name="gender"
-                    value={formik.values.date}
-                    onChange={formik.handleChange}
-                  />
-                  <label htmlFor="gender">Gender</label>
-                </span>
+              <div className="field mb-5 ">
+                <InputText
+                  id="image"
+                  name="image"
+                  type="file"
+                  onChange={(e) => setImage(e.target.files)}
+                />
               </div>
             </div>
             <div className="card w-30rem mx-5">
               <div className="field mb-5 ">
                 <span className="p-float-label">
                   <InputText
-                    id="name"
-                    name="name"
-                    value={formik.values.name}
+                    id="color"
+                    name="color"
+                    value={formik.values.color}
                     onChange={formik.handleChange}
                     autoFocus
                   />
-                  <label htmlFor="name">Profile Name*</label>
+                  <label htmlFor="color">Color*</label>
                 </span>
               </div>
               <div className="field mb-5 ">
                 <span className="p-float-label">
                   <InputText
-                    id="name"
-                    name="name"
-                    value={formik.values.name}
+                    id="tags"
+                    name="tags"
+                    value={formik.values.tags}
                     onChange={formik.handleChange}
                     autoFocus
                   />
-                  <label htmlFor="name">Height*</label>
+                  <label htmlFor="tags">Tags*</label>
                 </span>
               </div>
-              <div className="field mb-5 ">
+              <div className="field mb-5">
                 <span className="p-float-label">
                   <InputText
-                    id="name"
-                    name="name"
-                    value={formik.values.name}
+                    id="stock"
+                    name="stock"
+                    value={formik.values.stock}
                     onChange={formik.handleChange}
-                    autoFocus
+                    type="number"
                   />
-                  <label htmlFor="name">Weight*</label>
-                </span>
-              </div>
-              <div className="field mb-5 ">
-                <span className="p-float-label">
-                  <InputText
-                    id="name"
-                    name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    autoFocus
-                  />
-                  <label htmlFor="name">Age*</label>
-                </span>
-              </div>
-              <div className="field mb-5 ">
-                <span className="p-float-label">
-                  <InputText
-                    id="name"
-                    name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    autoFocus
-                  />
-                  <label htmlFor="name">If Female - then Breast Size*</label>
+                  <label htmlFor="stock">Stock*</label>
                 </span>
               </div>
             </div>
           </div>
-          <FileUpload />
-          <Button type="submit" label="Submit" className=" m-6 w-30rem" />
+
+          <Button
+            disabled={Object.keys(formik.errors).length}
+            type="submit"
+            label="Submit"
+            className="m-2 w-25rem"
+          />
         </form>
       </div>
     </div>
