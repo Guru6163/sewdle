@@ -1,6 +1,7 @@
 import { Divider } from "primereact/divider";
-import React, { useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useFormik } from "formik";
+import { Toast } from "primereact/toast";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
@@ -9,16 +10,17 @@ import { login } from "../../api/api";
 
 function Login() {
   const navigate = useNavigate();
-  const roleIds = [
-    {
-      id: "ff000000-0000-0000-0000-000000000000",
-      role: "Super Admin",
-    },
-    {
-      id: "ff000000-0000-0000-0000-000000000001",
-      role: "Customer",
-    },
-  ];
+  const [loading1, setLoading1] = useState(false);
+  const toast = useRef(null);
+  const showError = () => {
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: "Incorrect Email or Password",
+      life: 3000,
+    });
+  };
+
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -44,19 +46,33 @@ function Login() {
       return errors;
     },
     onSubmit: (data) => {
-      login(data.email, data.password).then((res) => {
-        if (res.status === 200) {
-          window.localStorage.setItem("user", JSON.stringify(res.data.user));
-          window.localStorage.setItem("token", res.data.token);
-        }
-      });
-      navigate("/dashboard");
-      formik.resetForm();
+      setLoading1(true);
+      setTimeout(() => {
+        login(data.email, data.password)
+          .then((res) => {
+            if (res.status === 200) {
+              window.localStorage.setItem(
+                "user",
+                JSON.stringify(res.data.user)
+              );
+              window.localStorage.setItem("token", res.data.token);
+              setLoading1(false);
+              formik.resetForm();
+              navigate("/dashboard");
+            }
+          })
+          .catch((err) => {
+            setLoading1(false);
+            console.log(err);
+            showError();
+          });
+      }, 1000);
     },
   });
 
   return (
     <div style={{ height: "100vh" }} className="">
+      <Toast ref={toast} />
       <div
         style={{ height: "100%" }}
         className="  flex flex-column align-items-center justify-content-center"
@@ -97,7 +113,12 @@ function Login() {
               </div>
             </div>
           </div>
-          <Button type="submit" label="Submit" className="mt-2 w-30rem" />
+          <Button
+            type="submit"
+            label="Submit"
+            className="mt-2 w-30rem"
+            loading={loading1}
+          />
         </form>
       </div>
     </div>
