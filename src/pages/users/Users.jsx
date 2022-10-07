@@ -21,7 +21,6 @@ function Users() {
 
   return (
     <div className="w-full">
-      <MenubarDemo />
       <div className="">
         <Toast ref={toast} position="top-center" />
         <TabMenu
