@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { DataView } from "primereact/dataview";
 import { Button } from "primereact/button";
 import { getAllFabrics } from "../../../api/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Badge } from "primereact/badge";
 
 function ListAllFabrics() {
+  const location = useLocation();
   const navigate = useNavigate();
   const [allFabrics, setAllFabrics] = useState([]);
 
@@ -13,7 +14,7 @@ function ListAllFabrics() {
     setAllFabrics(() => {
       getAllFabrics().then((res) => setAllFabrics(res.data));
     }, []);
-  }, []);
+  }, [location]);
 
   const renderGridItem = (data) => {
     return (
@@ -36,7 +37,9 @@ function ListAllFabrics() {
               alt={data.name}
             />
             <div className="p-1">
-              <div className="product-name font-bold capitalize">{data.fabric_type}</div>
+              <div className="product-name font-bold capitalize">
+                {data.fabric_type}
+              </div>
               <div className="product-name">
                 {/* Stocks : {data.stock} Rs */}
                 <div>Cost Per Metre : {data.cost_per_metre}</div>
