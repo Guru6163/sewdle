@@ -85,11 +85,11 @@ function AddMeasurements() {
       blouse_closure: "",
       saree_belt_width: "",
       crop_top_length: "",
-      profile_name: "Guru",
-      height: "12",
-      weight: "12",
-      gender: "male",
-      age: "12",
+      profile_name: "",
+      height: "",
+      weight: "",
+      gender: "",
+      age: "",
     },
     validate: (data) => {
       let errors = {};
