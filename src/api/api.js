@@ -9,11 +9,15 @@ const login = async (email, password) => {
   return response;
 };
 
-const addMeasurement = async(body, id) => {
+const addMeasurement = async (body, id) => {
   const response = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/admin/measurements/${id}`,
     body,
-  { headers: { "Content-Type": "application/json",
-  Authorization: `Bearer ${window.localStorage.getItem("token")}` } }
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`
+      }
+    }
   );
   return response;
 }
@@ -21,6 +25,18 @@ const addMeasurement = async(body, id) => {
 const getAllUsers = async () => {
   const response = await axios.get(
     `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/user/`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
+const getAllFabrics = async () => {
+  const response = await axios.get(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/fabric/`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -57,4 +73,11 @@ const deleteUser = async (id) => {
   return response;
 };
 
-export { login, getAllUsers, createUser, deleteUser, addMeasurement  };
+export {
+  login,
+  getAllUsers,
+  createUser,
+  deleteUser,
+  addMeasurement,
+  getAllFabrics
+};

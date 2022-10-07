@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useFormik } from "formik";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
-import { Image } from 'primereact/image';
+import { Image } from "primereact/image";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
@@ -14,7 +14,7 @@ import { classNames } from "primereact/utils";
 import bodyImage from "./images/figures-01.png";
 import sleeveImage from "./images/figures-02.png";
 import bottomImage from "./images/figures-03.png";
-import { addMeasurement, getAllUsers } from '../../api/api';
+import { addMeasurement, getAllUsers } from "../../../api/api";
 
 function AddMeasurements() {
   const [countries, setCountries] = useState([]);
@@ -27,21 +27,30 @@ function AddMeasurements() {
   const [users, setUsers] = useState([]);
   const [userID, setUserID] = useState();
 
-
   const toast = useRef(null);
+
+  const showSuccess = () => {
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Measurements Updated",
+      life: 3000,
+    });
+  };
+  const showError = (message) => {
+    toast.current.show({
+      severity: "error",
+      summary: "Error Message",
+      detail: message,
+      life: 3000,
+    });
+  };
 
   const formik = useFormik({
     initialValues: {
-      user_name: "",
-      profile_name: "",
-      age: "",
-      gender: "",
-      height: "",
-      weight: "",
       shoulder: "",
       front_neck_deep: "",
       back_neck_deep: "",
-      elbow_width: "",
       elbow_length: "",
       arm_hole: "",
       back_cross: "",
@@ -76,13 +85,14 @@ function AddMeasurements() {
       blouse_closure: "",
       saree_belt_width: "",
       crop_top_length: "",
+      profile_name: "Guru",
+      height: "12",
+      weight: "12",
+      gender: "male",
+      age: "12",
     },
     validate: (data) => {
       let errors = {};
-
-      if (!data.user_name) {
-        errors.user_name = "User Name is required.";
-      }
       if (!data.profile_name) {
         errors.profile_name = "Profile Name is required.";
       }
@@ -101,17 +111,20 @@ function AddMeasurements() {
       return errors;
     },
     onSubmit: (data) => {
+      const { user_name, ...rest } = data;
       setFormData(data);
+      console.log("Formdata", formData);
       setShowMessage(true);
-      handleClick(data);
-      formik.resetForm();
+      addMeasurement(rest, userID)
+        .then((res) => showSuccess())
+        .catch((err) => showError());
     },
   });
 
-  const isFormFieldValid = (name) => !!(formik.touched[name] && formik.errors[name]);
+  const isFormFieldValid = (name) =>
+    !!(formik.touched[name] && formik.errors[name]);
 
   const getFormErrorMessage = (name) => {
-    console.log(name)
     return (
       isFormFieldValid(name) && (
         <small className="p-error">{formik.errors[name]}</small>
@@ -121,60 +134,10 @@ function AddMeasurements() {
 
   useEffect(() => {
     getAllUsers().then((data) => {
-         setUsers(data.data);
-      })
+      setUsers(data.data);
+    });
   }, []);
 
-  const dialogFooter = (
-    <div className="flex justify-content-center">
-      <Button
-        label="OK"
-        className="p-button-text"
-        autoFocus
-        onClick={() => setShowMessage(false)}
-      />
-    </div>
-  );
-  const passwordHeader = <h6>Pick a password</h6>;
-  const passwordFooter = (
-    <React.Fragment>
-      <Divider />
-      <p className="mt-2">Suggestions</p>
-      <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: "1.5" }}>
-        <li>At least one lowercase</li>
-        <li>At least one uppercase</li>
-        <li>At least one numeric</li>
-        <li>Minimum 8 characters</li>
-      </ul>
-    </React.Fragment>
-  );
-
-  const handleClick = async (data) => {
-    const body = {
-      ...data,
-      user_name: data.first_name
-    }
-    const response = await addMeasurement(body, userID);
-
-    if (response.status === 204 || response.status === 200) {
-      console.log(data);
-      toast.current.show({
-        severity: "success",
-        summary: "Submit Successful",
-        detail: "",
-        life: 3000,
-      });
-    } else {
-      toast.current.show({
-        severity: "error",
-        summary: "Error Occurred",
-        detail: "",
-        life: 3000,
-      });
-    }
-
-  }
-  console.log(formik.values);
   return (
     <div>
       <Toast ref={toast} />
@@ -185,22 +148,36 @@ function AddMeasurements() {
         <form onSubmit={formik.handleSubmit} className="p-fluid">
           <div style={{ width: "98.9vw" }}>
             <div className="flex flex-wrap card mx-8">
-              <div className="flex justify-content-between" style={{ width: "100%" }}>
+              <div
+                className="flex justify-content-between"
+                style={{ width: "100%" }}
+              >
                 <div className="flex-wrap" style={{ width: "80%" }}>
                   <div className=" container flex my-2">
-                    <label htmlFor="name" className="mt-4" style={{ marginRight: "45px" }}>
+                    <label
+                      htmlFor="name"
+                      className="mt-4"
+                      style={{ marginRight: "45px" }}
+                    >
                       User Name
                     </label>
                     <p className="mt-4 mr-2">:</p>
                     <div>
-                      <Dropdown id="user_name" name="user_name" value={formik.values.user_name} options={users} onChange={(e) => {
-                        console.log(e)
-                        formik.handleChange(e)
-                        formik.values.profile_name = e.value.first_name
-                        formik.values.user_name = e.value.first_name
-                        setUserID(e.value.id);
-                      }} optionLabel="first_name" placeholder="Select a User" />
-                    {getFormErrorMessage('user_name')}
+                      <Dropdown
+                        id="user_name"
+                        name="user_name"
+                        value={formik.values.user_name}
+                        options={users}
+                        onChange={(e) => {
+                          formik.handleChange(e);
+                          formik.values.profile_name = e.value.first_name;
+                          formik.values.user_name = e.value.first_name;
+                          setUserID(e.value.id);
+                        }}
+                        optionLabel="first_name"
+                        placeholder="Select a User"
+                      />
+                      {getFormErrorMessage("user_name")}
                     </div>
                   </div>
                   <div className=" container flex my-2">
@@ -218,13 +195,17 @@ function AddMeasurements() {
                         value={formik.values.profile_name}
                         onChange={formik.handleChange}
                       />
-                    <div className="text-left">
-                    {getFormErrorMessage('profile_name')}
-                    </div>
+                      <div className="text-left">
+                        {getFormErrorMessage("profile_name")}
+                      </div>
                     </div>
                   </div>
                   <div className=" container flex my-2">
-                    <label htmlFor="name" className="mt-4" style={{ marginRight: "102px" }}>
+                    <label
+                      htmlFor="name"
+                      className="mt-4"
+                      style={{ marginRight: "102px" }}
+                    >
                       Age
                     </label>
                     <p className="mt-4 mr-2">:</p>
@@ -237,32 +218,41 @@ function AddMeasurements() {
                         style={{ width: "19rem" }}
                         value={formik.values.age}
                         onChange={formik.handleChange}
-                        />
-                        <div className="text-left">
-                        {getFormErrorMessage('age')}
-                        </div>  
+                      />
+                      <div className="text-left">
+                        {getFormErrorMessage("age")}
+                      </div>
                     </div>
                   </div>
                   <div className=" container flex my-2">
-                    <label htmlFor="name" className="mt-4" style={{ marginRight: "75px" }}>
+                    <label
+                      htmlFor="name"
+                      className="mt-4"
+                      style={{ marginRight: "75px" }}
+                    >
                       Gender
                     </label>
                     <p className="mt-4 mr-2">:</p>
                     <div>
-                      <InputText
+                      <Dropdown
                         id="gender"
                         name="gender"
                         type="text"
+                        options={[
+                          { name: "Male", field: "male" },
+                          { name: "Female", field: "female" },
+                        ]}
+                        optionLabel="name"
+                        optionValue="field"
                         className="border-none border-bottom-2"
                         style={{ width: "19rem" }}
                         value={formik.values.gender}
                         onChange={formik.handleChange}
                       />
                       <div className="text-left">
-                    {getFormErrorMessage('gender')}
+                        {getFormErrorMessage("gender")}
+                      </div>
                     </div>
-                    </div>
-                    
                   </div>
 
                   <div className="flex flex-wrap my-2">
@@ -282,10 +272,9 @@ function AddMeasurements() {
                           onChange={formik.handleChange}
                         />
                         <div className="text-left">
-                        {getFormErrorMessage('height')}
-                    </div>
+                          {getFormErrorMessage("height")}
+                        </div>
                       </div>
-                      
                     </div>
                     <div className="flex">
                       <label htmlFor="name" className="mt-4 mr-8">
@@ -303,10 +292,9 @@ function AddMeasurements() {
                           onChange={formik.handleChange}
                         />
                         <div className="text-left">
-                        {getFormErrorMessage('weight')}
-                    </div>
+                          {getFormErrorMessage("weight")}
+                        </div>
                       </div>
-                      
                     </div>
                   </div>
                 </div>
@@ -314,7 +302,10 @@ function AddMeasurements() {
 
               <div className="my-6" style={{ width: "91vw" }}>
                 <div className="flex flex-wrap container text-lg">
-                  <div className="flex my-2 justify-content-between mr-8 " style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8 "
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Shoulder
                     </label>
@@ -327,7 +318,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Front neck deep
                     </label>
@@ -340,7 +334,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Mid waist width
                     </label>
@@ -353,7 +350,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Armhole
                     </label>
@@ -366,7 +366,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Back cross
                     </label>
@@ -379,7 +382,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Low waist width
                     </label>
@@ -392,7 +398,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Upper chest width
                     </label>
@@ -405,7 +414,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Back neck deep
                     </label>
@@ -418,7 +430,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Hip width
                     </label>
@@ -431,7 +446,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Chest width
                     </label>
@@ -444,7 +462,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       High waist width
                     </label>
@@ -457,7 +478,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Aasan
                     </label>
@@ -470,7 +494,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Lower chest width
                     </label>
@@ -483,7 +510,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Bicep width
                     </label>
@@ -496,7 +526,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Thigh width
                     </label>
@@ -509,7 +542,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Shoulder to point
                     </label>
@@ -522,7 +558,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Elbow width
                     </label>
@@ -535,7 +574,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Calves width
                     </label>
@@ -546,10 +588,12 @@ function AddMeasurements() {
                       style={{ width: "10rem" }}
                       value={formik.values.calves_width}
                       onChange={formik.handleChange}
-
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Point to point
                     </label>
@@ -560,10 +604,12 @@ function AddMeasurements() {
                       style={{ width: "10rem" }}
                       value={formik.values.point_to_point}
                       onChange={formik.handleChange}
-
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Forearm width
                     </label>
@@ -576,7 +622,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Ankle width
                     </label>
@@ -587,10 +636,12 @@ function AddMeasurements() {
                       style={{ width: "10rem" }}
                       value={formik.values.ankle_width}
                       onChange={formik.handleChange}
-
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Front cross
                     </label>
@@ -603,7 +654,10 @@ function AddMeasurements() {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-8" style={{ width: "340px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-8"
+                    style={{ width: "340px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Wrist width
                     </label>
@@ -618,49 +672,34 @@ function AddMeasurements() {
                   </div>
                 </div>
                 <div className="flex flex-wrap my-2 text-lg">
-                  <div className="flex my-2 justify-content-between" style={{ width: "160px" }}>
+                  <div
+                    className="flex my-2 justify-content-between"
+                    style={{ width: "160px" }}
+                  >
                     <label htmlFor="name" className="mt-2">
                       Blouse Closure :
                     </label>
-
                   </div>
-                  <div className="flex my-2 justify-content-between mr-3" style={{ width: "220px" }}>
-                    <label htmlFor="name" className="mt-2 mr-2">
-                      Front hooks
-                    </label>
-                    <InputText
-                      style={{ width: "6rem" }}
-                    />
-                  </div>
-                  <div className="flex my-2 justify-content-between mr-3" style={{ width: "220px" }}>
-                    <label htmlFor="name" className="mt-2 mr-2">
-                      Back hooks
-                    </label>
-                    <InputText
-                      style={{ width: "6rem" }}
-
-                    />
-                  </div>
-                  <div className="flex my-2 justify-content-between" style={{ width: "180px" }}>
-                    <label htmlFor="name" className="mt-2 mr-2">
-                      Side zip
-                    </label>
-                    <InputText
-                      style={{ width: "6rem" }}
-
-                    />
-                  </div>
-
+                  <Dropdown
+                    onChange={formik.handleChange}
+                    style={{ width: "200px" }}
+                    options={["Front Hooks", "Back Hooks", "Side zip"]}
+                  ></Dropdown>
                 </div>
 
                 <div className="flex flex-wrap my-2 text-lg">
-                  <div className="flex my-2 justify-content-between" style={{ width: "165px" }}>
+                  <div
+                    className="flex my-2 justify-content-between"
+                    style={{ width: "165px" }}
+                  >
                     <label htmlFor="name" className="mt-3">
                       Pads Required :
                     </label>
-
                   </div>
-                  <div className="flex my-2 justify-content-between mr-5" style={{ width: "100px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-5"
+                    style={{ width: "100px" }}
+                  >
                     <label htmlFor="name" className="mt-3 mr-2">
                       Yes
                     </label>
@@ -671,7 +710,10 @@ function AddMeasurements() {
                       onChange={(e) => setYesChecked(e.checked)}
                     />
                   </div>
-                  <div className="flex my-2 justify-content-between mr-3" style={{ width: "93px" }}>
+                  <div
+                    className="flex my-2 justify-content-between mr-3"
+                    style={{ width: "93px" }}
+                  >
                     <label htmlFor="name" className="mt-3 mr-1">
                       No
                     </label>
@@ -682,19 +724,23 @@ function AddMeasurements() {
                       onChange={(e) => setNoChecked(e.checked)}
                     />
                   </div>
-
                 </div>
               </div>
 
-
-
-
               <div>
-                <div className="flex flex-wrap" style={{ width: "93vw", marginLeft: "-5rem" }}>
+                <div
+                  className="flex flex-wrap"
+                  style={{ width: "93vw", marginLeft: "-5rem" }}
+                >
                   <div className="flex justify-content-between ">
                     {/* Image */}
                     <div>
-                      <Image src={bodyImage} alt="Image" width="360px" height="820px" />
+                      <Image
+                        src={bodyImage}
+                        alt="Image"
+                        width="360px"
+                        height="820px"
+                      />
                     </div>
 
                     {/* Top Length */}
@@ -703,7 +749,10 @@ function AddMeasurements() {
                       <div style={{ marginBottom: "180px" }}>
                         <h1 className="text-left">Top length</h1>
                       </div>
-                      <div className="flex my-1 mr-8" style={{ width: "310px" }}>
+                      <div
+                        className="flex my-1 mr-8"
+                        style={{ width: "310px" }}
+                      >
                         <InputText
                           id="blouse_length"
                           name="blouse_length"
@@ -716,7 +765,10 @@ function AddMeasurements() {
                           Blouse length
                         </label>
                       </div>
-                      <div className="flex my-1 mr-8" style={{ width: "330px" }}>
+                      <div
+                        className="flex my-1 mr-8"
+                        style={{ width: "330px" }}
+                      >
                         <InputText
                           id="crop_top_length"
                           name="crop_top_length"
@@ -729,7 +781,10 @@ function AddMeasurements() {
                           Crop top length
                         </label>
                       </div>
-                      <div className="flex my-1 mr-8" style={{ width: "330px" }}>
+                      <div
+                        className="flex my-1 mr-8"
+                        style={{ width: "330px" }}
+                      >
                         <InputText
                           id="waist_length"
                           name="waist_length"
@@ -742,7 +797,10 @@ function AddMeasurements() {
                           Waist length
                         </label>
                       </div>
-                      <div className="flex mt-1 mr-8" style={{ width: "330px", marginBottom: "35px" }}>
+                      <div
+                        className="flex mt-1 mr-8"
+                        style={{ width: "330px", marginBottom: "35px" }}
+                      >
                         <InputText
                           id="hip_length"
                           name="hip_length"
@@ -755,15 +813,10 @@ function AddMeasurements() {
                           Hip length
                         </label>
                       </div>
-
                     </div>
-
                   </div>
 
-
-
                   <div>
-
                     {/* Sleeve Length */}
                     <div>
                       {/* heading */}
@@ -773,11 +826,19 @@ function AddMeasurements() {
                       {/* sleeve image */}
                       <div className="flex " style={{ width: "100%" }}>
                         <div>
-                          <Image src={sleeveImage} alt="Image" width="200px" height="360px" />
+                          <Image
+                            src={sleeveImage}
+                            alt="Image"
+                            width="200px"
+                            height="360px"
+                          />
                         </div>
                         {/* sleeve box */}
                         <div>
-                          <div className="flex mt-7 mr-8" style={{ width: "350px", marginBottom: "30px" }}>
+                          <div
+                            className="flex mt-7 mr-8"
+                            style={{ width: "350px", marginBottom: "30px" }}
+                          >
                             <InputText
                               id="bicep_length"
                               name="bicep_length"
@@ -786,11 +847,17 @@ function AddMeasurements() {
                               value={formik.values.bicep_length}
                               onChange={formik.handleChange}
                             />
-                            <label htmlFor="name" className="mt-2 ml-4 text-left">
+                            <label
+                              htmlFor="name"
+                              className="mt-2 ml-4 text-left"
+                            >
                               Bicep length
                             </label>
                           </div>
-                          <div className="flex mr-8" style={{ width: "350px", marginBottom: "30px" }}>
+                          <div
+                            className="flex mr-8"
+                            style={{ width: "350px", marginBottom: "30px" }}
+                          >
                             <InputText
                               id="elbow_length"
                               name="elbow_length"
@@ -803,7 +870,10 @@ function AddMeasurements() {
                               Elbow length
                             </label>
                           </div>
-                          <div className="flex mr-8" style={{ width: "350px", marginBottom: "20px" }}>
+                          <div
+                            className="flex mr-8"
+                            style={{ width: "350px", marginBottom: "20px" }}
+                          >
                             <InputText
                               id="forearm_length"
                               name="forearm_length"
@@ -816,7 +886,10 @@ function AddMeasurements() {
                               Forearm length
                             </label>
                           </div>
-                          <div className="flex my-2 mr-8" style={{ width: "350px" }}>
+                          <div
+                            className="flex my-2 mr-8"
+                            style={{ width: "350px" }}
+                          >
                             <InputText
                               id="full_sleeves_length"
                               name="full_sleeves_length"
@@ -833,7 +906,6 @@ function AddMeasurements() {
                       </div>
                     </div>
 
-
                     <div className="mt-2">
                       {/* heading */}
                       <div>
@@ -842,11 +914,19 @@ function AddMeasurements() {
                       {/* Bottom image */}
                       <div className="flex " style={{ width: "100%" }}>
                         <div>
-                          <Image src={bottomImage} alt="Image" width="200px" height="370px" />
+                          <Image
+                            src={bottomImage}
+                            alt="Image"
+                            width="200px"
+                            height="370px"
+                          />
                         </div>
                         {/* Bottom box */}
                         <div className="mt-8">
-                          <div className="flex mr-8 mt-4" style={{ width: "330px", marginBottom: "15px" }}>
+                          <div
+                            className="flex mr-8 mt-4"
+                            style={{ width: "330px", marginBottom: "15px" }}
+                          >
                             <InputText
                               id="mid_thigh_length"
                               name="mid_thigh_length"
@@ -859,7 +939,10 @@ function AddMeasurements() {
                               Mid thigh length
                             </label>
                           </div>
-                          <div className="flex mr-8" style={{ width: "330px", marginBottom: "15px" }}>
+                          <div
+                            className="flex mr-8"
+                            style={{ width: "330px", marginBottom: "15px" }}
+                          >
                             <InputText
                               id="knee_length"
                               name="knee_length"
@@ -872,7 +955,10 @@ function AddMeasurements() {
                               Knee length
                             </label>
                           </div>
-                          <div className="flex mr-8" style={{ width: "330px", marginBottom: "15px" }}>
+                          <div
+                            className="flex mr-8"
+                            style={{ width: "330px", marginBottom: "15px" }}
+                          >
                             <InputText
                               id="calves_length"
                               name="calves_length"
@@ -885,7 +971,10 @@ function AddMeasurements() {
                               Calves length
                             </label>
                           </div>
-                          <div className="flex mr-8" style={{ width: "330px", marginBottom: "15px" }}>
+                          <div
+                            className="flex mr-8"
+                            style={{ width: "330px", marginBottom: "15px" }}
+                          >
                             <InputText
                               id="ankle_length"
                               name="ankle_length"
@@ -921,7 +1010,6 @@ function AddMeasurements() {
           </div>
 
           <Button type="submit" label="Submit" className="my-2 w-15rem" />
-
         </form>
       </div>
     </div>
