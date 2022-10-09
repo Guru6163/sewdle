@@ -74,7 +74,7 @@ const MenubarDemo = () => {
       template: (item, options) => {
         return (
           <div
-            onClick={() => navigate("/templates")}
+            onClick={() => navigate("/templates/all")}
             className="text-white m-3 text-l"
             style={{ cursor: "pointer", letterSpacing: "1px" }}
           >
