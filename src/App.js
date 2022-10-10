@@ -27,6 +27,10 @@ import ListAllTemplates from "./pages/templates/components/ListAllTemplates";
 import AddNewTemplate from "./pages/templates/components/AddNewTemplate";
 import TemplateDetail from "./pages/templates/components/TemplateDetail";
 import UpdateTemplate from "./pages/templates/components/UpdateTemplate";
+import Categories from "./pages/categories/Categories";
+import AddCategories from "./pages/categories/components/AddCategories";
+import ListAllCategories from "./pages/categories/components/ListAllCategories";
+import ViewCategory from "./pages/categories/components/ViewCategory";
 
 function App() {
   return (
@@ -45,6 +49,15 @@ function App() {
                 </Route>
                 <Route path="addUsers" element={<AddNewUser />} />
                 <Route path="addMeasurements" element={<AddMeasurements />} />
+              </Route>
+            </Route>
+          </Route>
+          <Route path="categories" element={<DefaultOutlet />}>
+            <Route path="" element={<Categories />}>
+              <Route path="" element={<NestedOutlet />}>
+                <Route path="all" element={<ListAllCategories />} />
+                <Route path="addNewCategory" element={<AddCategories />} />
+                <Route path=":id" element={<ViewCategory />}></Route>
               </Route>
             </Route>
           </Route>
