@@ -1,12 +1,15 @@
 import { Divider } from "primereact/divider";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Toast } from "primereact/toast";
 import { useFormik } from "formik";
 import { InputText } from "primereact/inputtext";
+import { MultiSelect } from "primereact/multiselect";
+
 import { Button } from "primereact/button";
-import { addFabric } from "../../../api/api";
+import { addFabric, getAllCategories } from "../../../api/api";
 
 function AddNewFabric() {
+  const [allCategories, setAllCategories] = useState([]);
   const [image, setImage] = useState([]);
   const toast = useRef(null);
   const showSuccess = () => {
@@ -26,13 +29,17 @@ function AddNewFabric() {
     });
   };
 
+  useEffect(() => {
+    getAllCategories().then((res) => setAllCategories(res.data));
+  }, []);
+
   const formik = useFormik({
     initialValues: {
       fabric_type: "",
       cost_per_metre: "",
       stock: "",
       color: "",
-      tags: ["f107bc48-a81e-4fc3-bd94-52a8b67e7001"],
+      tags: [],
     },
     validate: (data) => {
       let errors = {};
@@ -64,8 +71,9 @@ function AddNewFabric() {
       formdata.append("cost_per_metre", JSON.stringify(data.cost_per_metre));
       formdata.append("stock", JSON.stringify(data.stock));
       formdata.append("color", data.color);
-      formdata.append("tags", "f107bc48-a81e-4fc3-bd94-52a8b67e7001");
-      formdata.append("tags", "b21c2a0f-6c0d-41e5-83a0-5c69ee9a5820");
+      data.tags.forEach((item) => {
+        formdata.append("tags", item);
+      });
       formdata.append("image", image[0]);
       addFabric(formdata)
         .then((res) => {
@@ -75,7 +83,7 @@ function AddNewFabric() {
         .catch((err) => showError());
     },
   });
-  console.log(formik.errors);
+  console.log(formik.values);
   return (
     <div>
       <h2 className="mb-4">Add Fabrics</h2>
@@ -133,10 +141,14 @@ function AddNewFabric() {
               </div>
               <div className="field mb-5 ">
                 <span className="p-float-label">
-                  <InputText
+                  <MultiSelect
+                    display="chip"
                     id="tags"
                     name="tags"
                     value={formik.values.tags}
+                    optionLabel="sub_category"
+                    optionValue="id"
+                    options={allCategories}
                     onChange={formik.handleChange}
                     autoFocus
                   />
