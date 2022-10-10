@@ -10,11 +10,14 @@ import { Checkbox } from "primereact/checkbox";
 import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { deleteUser } from "../../../api/api";
+import ShowProfilePopup from "./ShowProfilePopup";
 
 function ListAllUsers() {
   const toast = useRef(null);
+  const [selectedUserId, setSelectedUserId] = useState("");
   const navigate = useNavigate();
   const [update, setUpdate] = useState(false);
+  const [displayBasic, setDisplayBasic] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   useEffect(() => {
     getAllUsers().then((res) => setAllUsers(res.data));
@@ -121,8 +124,9 @@ function ListAllUsers() {
         <DataTable
           rowHover
           onRowClick={(e) => {
+            setDisplayBasic(true);
+            setSelectedUserId(e.data.id);
             console.log(e);
-            navigate(`${e.data.id}`);
           }}
           selectionMode="single"
           header={header}
@@ -149,6 +153,13 @@ function ListAllUsers() {
           <Column align="center" body={updateBody} header="Update"></Column>
           <Column align="center" body={deleletBody} header="Delete"></Column>
         </DataTable>
+        {displayBasic && (
+          <ShowProfilePopup
+            displayBasic={displayBasic}
+            setDisplayBasic={setDisplayBasic}
+            userId={selectedUserId}
+          />
+        )}
       </div>
     </div>
   );

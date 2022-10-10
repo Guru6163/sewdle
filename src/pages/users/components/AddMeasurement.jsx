@@ -18,7 +18,7 @@ import { addMeasurement, getAllUsers } from "../../../api/api";
 
 function AddMeasurements() {
   const [formData, setFormData] = useState({});
-  const [yesChecked, setYesChecked] = useState(false);
+  const [blouseClosure, setBlouseClouse] = useState("");
   const [noChecked, setNoChecked] = useState(false);
 
   const [users, setUsers] = useState([]);
@@ -88,6 +88,7 @@ function AddMeasurements() {
       gender: "",
       age: "",
     },
+
     validate: (data) => {
       let errors = {};
       if (!data.profile_name) {
@@ -109,6 +110,7 @@ function AddMeasurements() {
     },
     onSubmit: (data) => {
       const { user_name, ...rest } = data;
+      rest.pads_required = rest.pads_required ? "yes" : "no";
       setFormData(data);
       console.log("Formdata", formData);
       addMeasurement(rest, userID)
@@ -127,7 +129,7 @@ function AddMeasurements() {
       )
     );
   };
-
+  console.log(formik.values);
   useEffect(() => {
     getAllUsers().then((data) => {
       setUsers(data.data);
@@ -138,7 +140,7 @@ function AddMeasurements() {
     <div>
       <Toast ref={toast} />
       <Divider className="mt-5" align="center">
-        <h2>Add Measurements</h2>
+        <h2>Create Profiles and Add Measurements</h2>
       </Divider>
       <div className="flex flex-start">
         <form onSubmit={formik.handleSubmit} className="p-fluid">
@@ -160,16 +162,15 @@ function AddMeasurements() {
                     <p className="mt-4 mr-2">:</p>
                     <div>
                       <Dropdown
+                        style={{ width: "300px" }}
                         id="user_name"
                         name="user_name"
-                        value={formik.values.user_name}
+                        value={userID}
                         options={users}
                         onChange={(e) => {
-                          formik.handleChange(e);
-                          formik.values.profile_name = e.value.first_name;
-                          formik.values.user_name = e.value.first_name;
-                          setUserID(e.value.id);
+                          setUserID(e.target.value);
                         }}
+                        optionValue="first_name"
                         optionLabel="first_name"
                         placeholder="Select a User"
                       />
@@ -677,13 +678,24 @@ function AddMeasurements() {
                     </label>
                   </div>
                   <Dropdown
+                    id="blouse_closure"
+                    name="blouse_closure"
+                    type="text"
+                    options={[
+                      { name: "Front Hooks", field: "Front Hooks" },
+                      { name: "Back Hooks", field: "Back Hooks" },
+                      { name: "Side Zip", field: "Side Zip" },
+                    ]}
+                    optionLabel="name"
+                    optionValue="field"
+                    className="border-none border-bottom-2"
+                    style={{ width: "19rem" }}
+                    value={formik.values.blouse_closure}
                     onChange={formik.handleChange}
-                    style={{ width: "200px" }}
-                    options={["Front Hooks", "Back Hooks", "Side zip"]}
-                  ></Dropdown>
+                  />
                 </div>
 
-                <div className="flex flex-wrap my-2 text-lg">
+                <div className="flex flex-wrap my-2 text-lg  align-items-center">
                   <div
                     className="flex my-2 justify-content-between"
                     style={{ width: "165px" }}
@@ -696,28 +708,14 @@ function AddMeasurements() {
                     className="flex my-2 justify-content-between mr-5"
                     style={{ width: "100px" }}
                   >
-                    <label htmlFor="name" className="mt-3 mr-2">
-                      Yes
-                    </label>
                     <Checkbox
-                      inputId="binary"
+                      id="pads_required"
+                      name="pads_required"
                       className="mt-3"
-                      checked={yesChecked}
-                      onChange={(e) => setYesChecked(e.checked)}
-                    />
-                  </div>
-                  <div
-                    className="flex my-2 justify-content-between mr-3"
-                    style={{ width: "93px" }}
-                  >
-                    <label htmlFor="name" className="mt-3 mr-1">
-                      No
-                    </label>
-                    <Checkbox
-                      inputId="binary"
-                      className="mt-3"
-                      checked={noChecked}
-                      onChange={(e) => setNoChecked(e.checked)}
+                      checked={formik.values.pads_required}
+                      onChange={(e) => {
+                        formik.handleChange(e);
+                      }}
                     />
                   </div>
                 </div>

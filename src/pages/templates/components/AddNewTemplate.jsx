@@ -25,7 +25,7 @@ function AddNewTemplate() {
       life: 3000,
     });
   };
-
+ 
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -84,6 +84,19 @@ function AddNewTemplate() {
                     autoFocus
                   />
                   <label htmlFor="name">Name of Template*</label>
+                </span>
+              </div>
+              <div className="field mb-5">
+                <span className="p-float-label p-input-icon-right">
+                  <i className="pi pi-envelope" />
+                  <InputText
+                    id="style_name"
+                    name="style_name"
+                    type="text"
+                    value={formik.values.style_name}
+                    onChange={formik.handleChange}
+                  />
+                  <label htmlFor="style_name">Style Name*</label>
                 </span>
               </div>
               <div className="field mb-5">

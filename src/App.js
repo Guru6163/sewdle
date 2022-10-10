@@ -41,7 +41,7 @@ function App() {
               <Route path="" element={<NestedOutlet />}>
                 <Route path="allUsers" element={<NestedOutlet />}  >
                   <Route path="" element={<ListAllUsers />}></Route>
-                  <Route path=":id" element={<EditMeasurement />}></Route>
+                  <Route path=":id/:id" element={<EditMeasurement />}></Route>
                 </Route>
                 <Route path="addUsers" element={<AddNewUser />} />
                 <Route path="addMeasurements" element={<AddMeasurements />} />
