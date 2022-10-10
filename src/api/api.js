@@ -227,7 +227,7 @@ const deleteCategory = async (id) => {
   );
   return response;
 };
-const updateCategory = async (id,data) => {
+const updateCategory = async (id, data) => {
   const response = await axios.put(
     `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/category/${id}`,
     data,
