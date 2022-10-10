@@ -23,6 +23,10 @@ import AddMeasurements from "./pages/users/components/AddMeasurement";
 import { DefaultOutlet, NestedOutlet } from "./components/Outlet";
 import EditMeasurement from "./pages/users/components/EditMeasurement";
 import UpdateFabric from "./pages/fabrics/components/UpdateFabric";
+import ListAllTemplates from "./pages/templates/components/ListAllTemplates";
+import AddNewTemplate from "./pages/templates/components/AddNewTemplate";
+import TemplateDetail from "./pages/templates/components/TemplateDetail";
+import UpdateTemplate from "./pages/templates/components/UpdateTemplate";
 
 function App() {
   return (
@@ -65,9 +69,12 @@ function App() {
             <Route path=":id" element={<CollectionDetail />} />
           </Route>
           <Route path="templates" element={<Templates />}>
-            <Route path="all" element={<ListAllCollections />} />
-            <Route path="new" element={<AddNewCollection />} />
-            <Route path=":id" element={<CollectionDetail />} />
+            <Route path="all" element={<ListAllTemplates />} />
+            <Route path="new" element={<AddNewTemplate />} />
+            <Route path=":id" element={<NestedOutlet />} >
+              <Route path="" element={<TemplateDetail />} ></Route>
+              <Route path="update" element={<UpdateTemplate />} ></Route>
+            </Route>
           </Route>
           <Route path="orders" element={<Orders />}>
             <Route path="all" element={<ListAllOrders />} />

@@ -56,6 +56,41 @@ const deleteFabric = async (id) => {
   );
   return response;
 }
+const addTemplate = async (body) => {
+  const response = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/admin/template`,
+    body,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`
+      }
+    }
+  );
+  return response;
+}
+const updateTemplate = async (body, id) => {
+  const response = await axios.put(`${process.env.REACT_APP_BACKEND_BASE_URL}/admin/template/${id}`,
+    body,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`
+      }
+    }
+  );
+  return response;
+}
+const deleteTemplate = async (id) => {
+  const response = await axios.delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/admin/template/${id}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`
+      }
+    }
+  );
+  return response;
+}
 
 const getAllUsers = async () => {
   const response = await axios.get(
@@ -72,6 +107,18 @@ const getAllUsers = async () => {
 const getAllFabrics = async () => {
   const response = await axios.get(
     `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/fabric/`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
+const getAllTemplates = async () => {
+  const response = await axios.get(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/template/`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -127,8 +174,12 @@ export {
   deleteUser,
   addMeasurement,
   getAllFabrics,
+  getAllTemplates,
   getAllOrders,
   addFabric,
   deleteFabric,
-  updateFabric
+  updateFabric,
+  addTemplate,
+  deleteTemplate,
+  updateTemplate
 };
