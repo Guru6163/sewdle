@@ -152,7 +152,19 @@ const getAllProfiles = async (id) => {
   );
   return response;
 };
-const getProfileMeasurements = async (id,profileName) => {
+const getAllCategories = async () => {
+  const response = await axios.get(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/category`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
+const getProfileMeasurements = async (id, profileName) => {
   const response = await axios.get(
     `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/measurements/${id}?name=${profileName}`,
     {
@@ -177,10 +189,48 @@ const createUser = async (data) => {
   );
   return response;
 };
+const createCategory = async (data) => {
+  const response = await axios.post(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/category/`,
+    data,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
 
 const deleteUser = async (id) => {
   const response = await axios.delete(
     `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/user/${id}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
+const deleteCategory = async (id) => {
+  const response = await axios.delete(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/category/${id}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
+const updateCategory = async (id,data) => {
+  const response = await axios.put(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/category/${id}`,
+    data,
     {
       headers: {
         "Content-Type": "application/json",
@@ -207,5 +257,9 @@ export {
   deleteTemplate,
   updateTemplate,
   getAllProfiles,
-  getProfileMeasurements
+  getProfileMeasurements,
+  createCategory,
+  getAllCategories,
+  deleteCategory,
+  updateCategory
 };

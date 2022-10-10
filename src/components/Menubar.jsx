@@ -12,7 +12,7 @@ const MenubarDemo = () => {
         return (
           <div
             onClick={() => navigate("/dashboard")}
-            className="text-white m-3 text-l"
+            className="text-white m-3 text-sm"
             style={{ cursor: "pointer", letterSpacing: "1px" }}
           >
             <span>{item.label}</span>
@@ -22,13 +22,13 @@ const MenubarDemo = () => {
       icon: "pi pi-fw pi-file",
     },
     {
-      label: "All Users",
+      label: "Users",
 
       template: (item, options) => {
         return (
           <div
             onClick={() => navigate("/users/allUsers")}
-            className="text-white m-3 text-l"
+            className="text-white m-3 text-sm"
             style={{ cursor: "pointer", letterSpacing: "1px" }}
           >
             <span>{item.label}</span>
@@ -36,6 +36,38 @@ const MenubarDemo = () => {
         );
       },
       icon: "pi pi-fw pi-file",
+    },
+    {
+      label: "Categories",
+      icon: "pi pi-fw pi-pencil",
+
+      template: (item, options) => {
+        return (
+          <div
+            onClick={() => navigate("/categories/all")}
+            className="text-white m-3 text-sm"
+            style={{ cursor: "pointer", letterSpacing: "1px" }}
+          >
+            <span>{item.label}</span>
+          </div>
+        );
+      },
+    },
+    {
+      label: "Embroidary",
+      icon: "pi pi-fw pi-pencil",
+
+      template: (item, options) => {
+        return (
+          <div
+            onClick={() => navigate("/fabrics/all")}
+            className="text-white m-3 text-sm"
+            style={{ cursor: "pointer", letterSpacing: "1px" }}
+          >
+            <span>{item.label}</span>
+          </div>
+        );
+      },
     },
     {
       label: "Fabrics",
@@ -45,7 +77,7 @@ const MenubarDemo = () => {
         return (
           <div
             onClick={() => navigate("/fabrics/all")}
-            className="text-white m-3 text-l"
+            className="text-white m-3 text-sm"
             style={{ cursor: "pointer", letterSpacing: "1px" }}
           >
             <span>{item.label}</span>
@@ -60,7 +92,7 @@ const MenubarDemo = () => {
         return (
           <div
             onClick={() => navigate("/collections/all")}
-            className="text-white m-3 text-l"
+            className="text-white m-3 text-sm"
             style={{ cursor: "pointer", letterSpacing: "1px" }}
           >
             <span>{item.label}</span>
@@ -75,7 +107,7 @@ const MenubarDemo = () => {
         return (
           <div
             onClick={() => navigate("/templates/all")}
-            className="text-white m-3 text-l"
+            className="text-white m-3 text-sm"
             style={{ cursor: "pointer", letterSpacing: "1px" }}
           >
             <span>{item.label}</span>
@@ -90,7 +122,7 @@ const MenubarDemo = () => {
         return (
           <div
             onClick={() => navigate("/orders/all")}
-            className="text-white m-3 text-l"
+            className="text-white m-3 text-sm"
             style={{ cursor: "pointer", letterSpacing: "1px" }}
           >
             <span>{item.label}</span>
@@ -127,7 +159,7 @@ const MenubarDemo = () => {
           start={start}
           end={
             <Button
-              className="p-button-outlined p-button-secondary m-3 text-white "
+              className="  m-3  p-button-sm"
               label="Logout"
               onClick={() => navigate("/")}
               icon="pi pi-power-off"
