@@ -140,6 +140,30 @@ const getAllOrders = async () => {
   );
   return response;
 };
+const getAllProfiles = async (id) => {
+  const response = await axios.get(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/measurements/${id}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
+const getProfileMeasurements = async (id,profileName) => {
+  const response = await axios.get(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/measurements/${id}?name=${profileName}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
 const createUser = async (data) => {
   const response = await axios.post(
     `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/user/`,
@@ -181,5 +205,7 @@ export {
   updateFabric,
   addTemplate,
   deleteTemplate,
-  updateTemplate
+  updateTemplate,
+  getAllProfiles,
+  getProfileMeasurements
 };

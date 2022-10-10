@@ -10,17 +10,20 @@ import { Checkbox } from "primereact/checkbox";
 import bodyImage from "./images/figures-01.png";
 import sleeveImage from "./images/figures-02.png";
 import bottomImage from "./images/figures-03.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { getAllProfiles, getProfileMeasurements } from "../../../api/api";
 
 function EditMeasurement() {
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
+  const location = useLocation();
   const [yesChecked, setYesChecked] = useState(false);
   const [noChecked, setNoChecked] = useState(false);
 
-  const [users, setUsers] = useState([]);
-  const [userID, setUserID] = useState();
+  const [profiles, setProfiles] = useState([]);
 
+  const [profileData, setprofileData] = useState([]);
+  console.log(profileData);
   const toast = useRef(null);
 
   const showSuccess = () => {
@@ -42,49 +45,50 @@ function EditMeasurement() {
 
   const formik = useFormik({
     initialValues: {
-      shoulder: "",
-      front_neck_deep: "",
-      back_neck_deep: "",
-      elbow_length: "",
-      arm_hole: "",
-      back_cross: "",
-      forearm_width: "",
-      forearm_length: "",
-      upper_chest_width: "",
-      lower_chest_width: "",
-      wrist_width: "",
-      high_waist_width: "",
-      mid_waist_width: "",
-      low_waist_width: "",
-      waist_length: "",
-      chest_width: "",
-      aasan: "",
-      shoulder_to_point: "",
-      point_to_point: "",
-      floor_length: "",
-      thigh_width: "",
-      mid_thigh_length: "",
-      calves_width: "",
-      calves_length: "",
-      hip_width: "",
-      hip_length: "",
-      ankle_width: "",
-      ankle_length: "",
-      knee_length: "",
-      front_cross: "",
-      bicep_width: "",
-      bicep_length: "",
-      full_sleeves_length: "",
-      blouse_length: "",
-      blouse_closure: "",
-      saree_belt_width: "",
-      crop_top_length: "",
-      profile_name: "",
-      height: "",
-      weight: "",
-      gender: "",
-      age: "",
+      shoulder: profileData.shoulder,
+      front_neck_deep: profileData.front_neck_deep,
+      back_neck_deep: profileData.back_neck_deep,
+      elbow_length: profileData.elbow_length,
+      arm_hole: profileData.arm_hole,
+      back_cross: profileData.back_cross,
+      forearm_width: profileData.forearm_width,
+      forearm_length: profileData.forearm_width,
+      upper_chest_width: profileData.upper_chest_width,
+      lower_chest_width: profileData.lower_chest_width,
+      wrist_width: profileData.wrist_width,
+      high_waist_width: profileData.high_waist_width,
+      mid_waist_width: profileData.mid_waist_width,
+      low_waist_width: profileData.low_waist_width,
+      waist_length: profileData.waist_length,
+      chest_width: profileData.chest_width,
+      aasan: profileData.aasan,
+      shoulder_to_point: profileData.shoulder_to_point,
+      point_to_point: profileData.point_to_point,
+      floor_length: profileData.floor_length,
+      thigh_width: profileData.thigh_width,
+      mid_thigh_length: profileData.mid_thigh_length,
+      calves_width: profileData.calves_length,
+      calves_length: profileData.calves_length,
+      hip_width: profileData.hip_width,
+      hip_length: profileData.hip_length,
+      ankle_width: profileData.ankle_width,
+      ankle_length: profileData.ankle_length,
+      knee_length: profileData.knee_length,
+      front_cross: profileData.front_cross,
+      bicep_width: profileData.bicep_width,
+      bicep_length: profileData.bicep_length,
+      full_sleeves_length: profileData.full_sleeves_length,
+      blouse_length: profileData.blouse_length,
+      blouse_closure: profileData.blouse_closure,
+      saree_belt_width: profileData.saree_belt_width,
+      crop_top_length: profileData.crop_top_length,
+      profile_name: profileData.profile_name,
+      height: profileData.height,
+      weight: profileData.weight,
+      gender: profileData.gender,
+      age: profileData.age,
     },
+    enableReinitialize: true,
     validate: (data) => {
       let errors = {};
       if (!data.profile_name) {
@@ -126,22 +130,19 @@ function EditMeasurement() {
     );
   };
 
+  const selectedProfile = location.pathname.split("/")[4];
   useEffect(() => {
-    //   getAllUsers().then((data) => {
-    //     setUsers(data.data);
-    //   });
-  }, []);
+    getProfileMeasurements(
+      location.pathname.split("/")[3],
+      selectedProfile
+    ).then((res) => setprofileData(res.data[0]));
+  }, [selectedProfile, location]);
 
   return (
     <div>
       <Toast ref={toast} />
       <div className="text-left flex justify-content-center align-items-center">
-        {/* <Button
-          className="mx-2"
-          style={{ width: "180px" }}
-          label="Go Back"
-        ></Button> */}
-        <h2 className="mx-2">Edit Measurements</h2>
+        <h2 className="mx-2">View / Edit Measurements</h2>
       </div>
 
       <div className="flex flex-start">
@@ -154,6 +155,16 @@ function EditMeasurement() {
               >
                 <div className="flex-wrap mt-3" style={{ width: "80%" }}>
                   <div className="container flex flex-row my-2 justify-content-start align-items-center ">
+                    <label htmlFor="name" className=" mr-5">
+                      Select Profile
+                    </label>
+                    <p className=" mr-2">:</p>
+                    <div>
+                      <InputText disabled value={selectedProfile}></InputText>
+                      <div className="text-left"></div>
+                    </div>
+                  </div>
+                  {/* <div className="container flex flex-row my-2 justify-content-start align-items-center ">
                     <label htmlFor="name" style={{ marginRight: "45px" }}>
                       User Name
                     </label>
@@ -166,7 +177,7 @@ function EditMeasurement() {
                         className="border-none border-bottom-2 p-inputtext-sm"
                         style={{ width: "19rem" }}
                       />
-                      {/* <Dropdown
+                      <Dropdown
                         id="user_name"
                         name="user_name"
                         value={formik.values.user_name}
@@ -179,10 +190,10 @@ function EditMeasurement() {
                         }}
                         optionLabel="first_name"
                         placeholder="Select a User"
-                      /> */}
+                      />
                       {getFormErrorMessage("user_name")}
                     </div>
-                  </div>
+                  </div> */}
                   <div className="container flex flex-row my-2 justify-content-start align-items-center ">
                     <label htmlFor="name" className=" mr-5">
                       Profile Name
