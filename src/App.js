@@ -31,6 +31,10 @@ import Categories from "./pages/categories/Categories";
 import AddCategories from "./pages/categories/components/AddCategories";
 import ListAllCategories from "./pages/categories/components/ListAllCategories";
 import ViewCategory from "./pages/categories/components/ViewCategory";
+import Embroidary from "./pages/embroidary/Embroidary";
+import ListAllEmbroidary from "./pages/embroidary/components/ListAllEmbroidary"
+import AddEmbroidary from "./pages/embroidary/components/AddEmbroidary"
+import ViewEmbroidary from "./pages/embroidary/components/ViewEmbroidary"
 
 function App() {
   return (
@@ -58,6 +62,15 @@ function App() {
                 <Route path="all" element={<ListAllCategories />} />
                 <Route path="addNewCategory" element={<AddCategories />} />
                 <Route path=":id" element={<ViewCategory />}></Route>
+              </Route>
+            </Route>
+          </Route>
+          <Route path="embroidary" element={<DefaultOutlet />}>
+            <Route path="" element={<Embroidary />}>
+              <Route path="" element={<NestedOutlet />}>
+                <Route path="all" element={<ListAllEmbroidary />} />
+                <Route path="addNewEmbroidary" element={<AddEmbroidary />} />
+                <Route path=":id" element={<ViewEmbroidary />}></Route>
               </Route>
             </Route>
           </Route>

@@ -164,6 +164,18 @@ const getAllCategories = async () => {
   );
   return response;
 };
+const getAllEmbroidaries = async () => {
+  const response = await axios.get(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/embroidery`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
 const getProfileMeasurements = async (id, profileName) => {
   const response = await axios.get(
     `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/measurements/${id}?name=${profileName}`,
@@ -202,6 +214,19 @@ const createCategory = async (data) => {
   );
   return response;
 };
+const createEmbroidary = async (data) => {
+  const response = await axios.post(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/embroidery/`,
+    data,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
 
 const deleteUser = async (id) => {
   const response = await axios.delete(
@@ -218,6 +243,18 @@ const deleteUser = async (id) => {
 const deleteCategory = async (id) => {
   const response = await axios.delete(
     `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/category/${id}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
+const deleteEmbroidary = async (id) => {
+  const response = await axios.delete(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/embroidery/${id}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -261,5 +298,8 @@ export {
   createCategory,
   getAllCategories,
   deleteCategory,
-  updateCategory
+  updateCategory,
+  getAllEmbroidaries,
+  deleteEmbroidary,
+  createEmbroidary
 };
