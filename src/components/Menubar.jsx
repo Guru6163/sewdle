@@ -60,7 +60,7 @@ const MenubarDemo = () => {
       template: (item, options) => {
         return (
           <div
-            onClick={() => navigate("/fabrics/all")}
+            onClick={() => navigate("/embroidary/all")}
             className="text-white m-3 text-sm"
             style={{ cursor: "pointer", letterSpacing: "1px" }}
           >

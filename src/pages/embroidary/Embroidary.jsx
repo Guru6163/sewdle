@@ -2,43 +2,35 @@ import React, { useState, useRef, useEffect } from "react";
 import { TabMenu } from "primereact/tabmenu";
 import { useNavigate, Outlet } from "react-router-dom";
 import { ProgressSpinner } from "primereact/progressspinner";
-import ListAllFabrics from "./components/ListAllFabrics";
-import AddNewFabric from "./components/AddNewFabric";
-import MenubarDemo from "../../components/Menubar";
 
-function Fabrics() {
+function Embroidary() {
   const [isLoading, setLoading] = useState(false);
   const navigate = useNavigate();
-
   const [activeIndex, setActiveIndex] = useState(0);
   const toast = useRef(null);
-
   useEffect(() => {
     setTimeout(() => setLoading(false), 1000);
   }, [isLoading]);
   const items = [
-    { label: "List All Fabrics", icon: "pi pi-fw pi-pencil" },
+    { label: "All Embroidaries", icon: "pi pi-fw pi-pencil" },
     {
-      label: "Add Fabrics",
+      label: "Add Embroidaries",
       icon: "pi pi-fw pi-home",
     },
   ];
-  return (   
+  return (
     <div>
-      <MenubarDemo />
       <TabMenu
         activeIndex={activeIndex}
         onTabChange={(e) => {
+          setActiveIndex(e.index);
           if (e.index === 0) {
-            setActiveIndex(e.index);
-            setLoading(true);
             navigate("all");
           }
           if (e.index === 1) {
-            navigate("new");
-            setActiveIndex(e.index);
-            setLoading(true);
+            navigate("addNewEmbroidary");
           }
+          setLoading(true);
         }}
         className="m-3"
         model={items}
@@ -57,4 +49,4 @@ function Fabrics() {
   );
 }
 
-export default Fabrics;
+export default Embroidary;
