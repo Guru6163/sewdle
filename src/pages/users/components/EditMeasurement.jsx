@@ -11,7 +11,7 @@ import bodyImage from "./images/figures-01.png";
 import sleeveImage from "./images/figures-02.png";
 import bottomImage from "./images/figures-03.png";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getAllProfiles, getProfileMeasurements } from "../../../api/api";
+import { updateMeasurement, getProfileMeasurements } from "../../../api/api";
 
 function EditMeasurement() {
   const [formData, setFormData] = useState({});
@@ -49,6 +49,7 @@ function EditMeasurement() {
       front_neck_deep: profileData.front_neck_deep,
       back_neck_deep: profileData.back_neck_deep,
       elbow_length: profileData.elbow_length,
+      elbow_width: profileData.elbow_width,
       arm_hole: profileData.arm_hole,
       back_cross: profileData.back_cross,
       forearm_width: profileData.forearm_width,
@@ -87,6 +88,7 @@ function EditMeasurement() {
       weight: profileData.weight,
       gender: profileData.gender,
       age: profileData.age,
+      pads_required: profileData.pads_required,
     },
     enableReinitialize: true,
     validate: (data) => {
@@ -109,13 +111,17 @@ function EditMeasurement() {
       return errors;
     },
     onSubmit: (data) => {
-      const { user_name, ...rest } = data;
+      const { user_name, pads_required, ...rest } = data;
+      const padsVal = pads_required === true ? "yes" : "no";
       setFormData(data);
       console.log("Formdata", formData);
 
-      // addMeasurement(rest, userID)
-      //   .then((res) => showSuccess())
-      //   .catch((err) => showError());
+      updateMeasurement(location.pathname.split("/")[3], {
+        ...rest,
+        pads_required: padsVal,
+      })
+        .then((res) => showSuccess())
+        .catch((err) => showError());
     },
   });
 
@@ -154,46 +160,17 @@ function EditMeasurement() {
                 style={{ width: "100%" }}
               >
                 <div className="flex-wrap mt-3" style={{ width: "80%" }}>
-                  <div className="container flex flex-row my-2 justify-content-start align-items-center ">
-                    <label htmlFor="name" className=" mr-5">
-                      Select Profile
+                  <div className="container flex flex-row my-2 justify-content-start align-items-center text-xl font-bold ">
+                    <label htmlFor="name" className=" mr-3">
+                      Selected Profile
                     </label>
                     <p className=" mr-2">:</p>
                     <div>
-                      <InputText disabled value={selectedProfile}></InputText>
+                      {selectedProfile}
                       <div className="text-left"></div>
                     </div>
                   </div>
-                  {/* <div className="container flex flex-row my-2 justify-content-start align-items-center ">
-                    <label htmlFor="name" style={{ marginRight: "45px" }}>
-                      User Name
-                    </label>
-                    <p className="mr-2">:</p>
-                    <div>
-                      {formik.values.profile_name}
-                      <InputText
-                        disabled
-                        type="text"
-                        className="border-none border-bottom-2 p-inputtext-sm"
-                        style={{ width: "19rem" }}
-                      />
-                      <Dropdown
-                        id="user_name"
-                        name="user_name"
-                        value={formik.values.user_name}
-                        options={users}
-                        onChange={(e) => {
-                          formik.handleChange(e);
-                          formik.values.profile_name = e.value.first_name;
-                          formik.values.user_name = e.value.first_name;
-                          setUserID(e.value.id);
-                        }}
-                        optionLabel="first_name"
-                        placeholder="Select a User"
-                      />
-                      {getFormErrorMessage("user_name")}
-                    </div>
-                  </div> */}
+
                   <div className="container flex flex-row my-2 justify-content-start align-items-center ">
                     <label htmlFor="name" className=" mr-5">
                       Profile Name
@@ -695,6 +672,9 @@ function EditMeasurement() {
                     </label>
                   </div>
                   <Dropdown
+                    id="blouse_closure"
+                    name="blouse_closure"
+                    value={formik.values.blouse_closure}
                     onChange={formik.handleChange}
                     style={{ width: "200px" }}
                     options={["Front Hooks", "Back Hooks", "Side zip"]}
@@ -714,28 +694,19 @@ function EditMeasurement() {
                     className="flex my-2 justify-content-between mr-5"
                     style={{ width: "100px" }}
                   >
-                    <label htmlFor="name" className="mt-3 mr-2">
-                      Yes
-                    </label>
                     <Checkbox
-                      inputId="binary"
+                      id="pads_required"
+                      name="pads_required"
                       className="mt-3"
-                      checked={yesChecked}
-                      onChange={(e) => setYesChecked(e.checked)}
-                    />
-                  </div>
-                  <div
-                    className="flex my-2 justify-content-between mr-3"
-                    style={{ width: "93px" }}
-                  >
-                    <label htmlFor="name" className="mt-3 mr-1">
-                      No
-                    </label>
-                    <Checkbox
-                      inputId="binary"
-                      className="mt-3"
-                      checked={noChecked}
-                      onChange={(e) => setNoChecked(e.checked)}
+                      checked={
+                        formik.values.pads_required === "yes" ||
+                        formik.values.pads_required === true
+                          ? true
+                          : false
+                      }
+                      onChange={(e) => {
+                        formik.handleChange(e);
+                      }}
                     />
                   </div>
                 </div>
