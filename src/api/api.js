@@ -277,6 +277,19 @@ const updateCategory = async (id, data) => {
   );
   return response;
 };
+const updateMeasurement = async (id, data) => {
+  const response = await axios.put(
+    `${process.env.REACT_APP_BACKEND_BASE_URL}/admin/measurements/${id}`,
+    data,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response;
+};
 
 export {
   login,
@@ -301,5 +314,6 @@ export {
   updateCategory,
   getAllEmbroidaries,
   deleteEmbroidary,
-  createEmbroidary
+  createEmbroidary,
+  updateMeasurement
 };

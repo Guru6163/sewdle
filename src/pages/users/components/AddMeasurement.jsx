@@ -25,7 +25,7 @@ function AddMeasurements() {
   const [userID, setUserID] = useState();
 
   const toast = useRef(null);
-
+  console.log(userID);
   const showSuccess = () => {
     toast.current.show({
       severity: "success",
@@ -66,6 +66,7 @@ function AddMeasurements() {
       point_to_point: "",
       floor_length: "",
       thigh_width: "",
+      elbow_width:"",
       mid_thigh_length: "",
       calves_width: "",
       calves_length: "",
@@ -170,7 +171,7 @@ function AddMeasurements() {
                         onChange={(e) => {
                           setUserID(e.target.value);
                         }}
-                        optionValue="first_name"
+                        optionValue="id"
                         optionLabel="first_name"
                         placeholder="Select a User"
                       />
